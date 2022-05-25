@@ -106,8 +106,8 @@ class Cache(config: Config) extends Module {
   }
 
   // Cache entry memory
-  val cacheEntryMem = SyncReadMem(config.depth, Bits(new Entry(config).getWidth.W))
-  val cacheEntry = cacheEntryMem.read(request.addr.index).asTypeOf(new Entry(config))
+  val cacheEntryMem = SyncReadMem(config.depth, new Entry(config))
+  val cacheEntry = cacheEntryMem.read(request.addr.index)
   val cacheEntryReg = RegEnable(cacheEntry, stateReg === State.latch)
 
   // Assert the burst counter enable signal as words are bursted from memory
@@ -166,7 +166,7 @@ class Cache(config: Config) extends Module {
   // Write cache entry
   when(stateReg === State.init || stateReg === State.write) {
     val index = Mux(stateReg === State.write, requestReg.addr.index, initCounter)
-    val data = Mux(stateReg === State.write, cacheEntryReg.asUInt, 0.U)
+    val data = Mux(stateReg === State.write, cacheEntryReg, Entry.zero(config))
     cacheEntryMem.write(index, data)
   }
 

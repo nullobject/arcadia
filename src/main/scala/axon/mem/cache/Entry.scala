@@ -94,3 +94,15 @@ class Entry(private val config: Config) extends Bundle {
     entry
   }
 }
+
+object Entry {
+  /**
+   * Creates an empty cache entry.
+   *
+   * @param config The cache configuration.
+   * @return A cache entry.
+   */
+  def zero(config: Config): Entry = {
+    0.U.asTypeOf(new Entry(config))
+  }
+}
