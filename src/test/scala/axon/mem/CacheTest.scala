@@ -39,7 +39,7 @@ import org.scalatest._
 import flatspec.AnyFlatSpec
 import matchers.should.Matchers
 
-trait CacheMemTestHelpers {
+trait CacheTestHelpers {
   protected val cacheConfig = Config(
     inAddrWidth = 16,
     inDataWidth = 8,
@@ -131,7 +131,7 @@ trait CacheMemTestHelpers {
     while (!dut.io.debug.write.peekBoolean()) { dut.clock.step() }
 }
 
-class CacheTest extends AnyFlatSpec with ChiselScalatestTester with Matchers with CacheMemTestHelpers {
+class CacheTest extends AnyFlatSpec with ChiselScalatestTester with Matchers with CacheTestHelpers {
   behavior of "FSM"
 
   it should "not move to the latch state when the cache is disabled" in {
