@@ -34,16 +34,20 @@ package axon.mem.cache
 
 import chisel3._
 
-/** Represents an entry stored in the cache. */
+/**
+ * Represents an entry stored in the cache.
+ *
+ * @param config The cache configuration.
+ */
 class Entry(private val config: Config) extends Bundle {
-  /** The cache line */
-  val line = new Line(config)
-  /** The most significant bits of the address */
-  val tag = UInt(config.tagWidth.W)
   /** Flag to indicate whether the cache entry is valid */
   val valid = Bool()
   /** Flag to indicate whether the cache entry is dirty */
   val dirty = Bool()
+  /** The most significant bits of the address */
+  val tag = UInt(config.tagWidth.W)
+  /** The cache line */
+  val line = new Line(config)
 
   /**
    * Returns the input word at the given offset.
