@@ -41,6 +41,8 @@ import chisel3.util._
  * bus.
  *
  * A cache line can also be represented a vector of input words, by rearranging the byte grouping.
+ *
+ * @param config The cache configuration.
  */
 class Line(private val config: Config) extends Bundle {
   private val inByteWidth = config.inDataWidth / 8
