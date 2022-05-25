@@ -123,8 +123,8 @@ class Cache(config: Config) extends Module {
 
   // Control signals
   val start = io.enable && request.valid
-  val dirty = cacheEntryReg.dirty && cacheEntryReg.tag =/= requestReg.addr.tag
-  val hit = cacheEntryReg.valid && cacheEntryReg.tag === requestReg.addr.tag
+  val dirty = cacheEntryReg.isDirty(requestReg.addr)
+  val hit = cacheEntryReg.isHit(requestReg.addr)
   val miss = !hit
 
   // Deassert the wait signal during the idle state, or at the end of a request to allow chaining

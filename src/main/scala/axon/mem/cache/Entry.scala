@@ -50,6 +50,20 @@ class Entry(private val config: Config) extends Bundle {
   val line = new Line(config)
 
   /**
+   * Determines whether the cache entry matches a given memory address.
+   *
+   * @param addr The memory address.
+   */
+  def isHit(addr: Address): Bool = valid && this.tag === addr.tag
+
+  /**
+   * Determines whether the cache entry should be evicted for a given memory address.
+   *
+   * @param addr The memory address.
+   */
+  def isDirty(addr: Address): Bool = dirty && this.tag =/= addr.tag
+
+  /**
    * Returns the input word at the given offset.
    *
    * @param offset The address offset.
