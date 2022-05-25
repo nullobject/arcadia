@@ -173,11 +173,11 @@ class Cache(config: Config) extends Module {
   // Fill cache line as words are bursted
   when(stateReg === State.fillWait && io.out.valid) {
     val fillOffset = if (config.wrapping) requestReg.addr.offset else 0.U
-    cacheEntryReg.fill(requestReg.addr.tag, fillOffset + burstCounter, io.out.dout)
+    cacheEntryReg := cacheEntryReg.fill(requestReg.addr.tag, fillOffset + burstCounter, io.out.dout)
   }
 
   // Merge the input data with the cache line
-  when(stateReg === State.merge) { cacheEntryReg.merge(offsetReg, dataReg) }
+  when(stateReg === State.merge) { cacheEntryReg := cacheEntryReg.merge(offsetReg, dataReg) }
 
   // Default to the previous state
   nextState := stateReg
