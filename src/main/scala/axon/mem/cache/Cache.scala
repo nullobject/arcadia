@@ -87,7 +87,7 @@ class Cache(config: Config) extends Module {
   val stateReg = RegNext(nextState, State.init)
 
   // Cache memory request
-  val request = MemRequest(io.in.rd, io.in.wr, Address(io.in.addr)(config))
+  val request = MemRequest(io.in.rd, io.in.wr, Address(config, io.in.addr))
 
   // Assert the latch signal when a request should be latched
   val latch = nextState === State.latch
@@ -154,11 +154,11 @@ class Cache(config: Config) extends Module {
   // Calculate the output byte address
   val outAddr = {
     val fillAddr = if (!config.wrapping) {
-      Address(requestReg.addr.tag, requestReg.addr.index, 0.U)(config)
+      Address(config, requestReg.addr.tag, requestReg.addr.index, 0.U)
     } else {
       requestReg.addr
     }
-    val evictAddr = Address(cacheEntryReg.tag, requestReg.addr.index, 0.U)(config)
+    val evictAddr = Address(config, cacheEntryReg.tag, requestReg.addr.index, 0.U)
     val addr = Mux(stateReg === State.fill, fillAddr, evictAddr).asUInt
     (addr << log2Ceil(config.outBytes)).asUInt
   }
