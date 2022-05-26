@@ -225,4 +225,43 @@ object AsyncReadWriteMemIO {
     mem.dout := MuxLookup(key, 0.U, doutMap)
     mem
   }
+
+  /**
+   * Multiplexes requests from multiple read-write memory interface to a single read-write memory
+   * interface. The request is routed to the memory interface with the highest priority.
+   *
+   * @param in A list of enable-interface pairs.
+   */
+  def mux1H(in: Seq[(Bool, AsyncReadWriteMemIO)]): AsyncReadWriteMemIO = {
+    val mem = Wire(chiselTypeOf(in.head._2))
+    mem.rd := Mux1H(in.map(a => a._1 -> a._2.rd))
+    mem.wr := Mux1H(in.map(a => a._1 -> a._2.wr))
+    mem.addr := Mux1H(in.map(a => a._1 -> a._2.addr))
+    mem.mask := Mux1H(in.map(a => a._1 -> a._2.mask))
+    mem.din := Mux1H(in.map(a => a._1 -> a._2.din))
+    for ((selected, port) <- in) {
+      port.waitReq := !selected || mem.waitReq
+      port.valid := selected && mem.valid
+      port.dout := mem.dout
+    }
+    mem
+  }
+
+  /**
+   * Multiplexes requests from multiple read-write memory interface to a single read-write memory
+   * interfaces. The request is routed to the first enabled interface.
+   *
+   * @param sel A list of enable signals.
+   * @param in  A list of read-write memory interfaces.
+   */
+  def mux1H(sel: Seq[Bool], in: Seq[AsyncReadWriteMemIO]): AsyncReadWriteMemIO = mux1H(sel zip in)
+
+  /**
+   * Multiplexes requests from multiple read-write memory interface to a single read-write memory
+   * interfaces. The request is routed to indexed interface.
+   *
+   * @param index An index signal.
+   * @param in    A list of read-write memory interfaces.
+   */
+  def mux1H(index: UInt, in: Seq[AsyncReadWriteMemIO]): AsyncReadWriteMemIO = mux1H(in.indices.map(index(_)), in)
 }
