@@ -30,24 +30,28 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package axon.mem
+package axon.mem.buffer
 
 import chisel3._
 import chiseltest._
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-class BurstBufferTest extends AnyFlatSpec with ChiselScalatestTester with Matchers {
-  private def mkBuffer(inDataWidth: Int, outDataWidth: Int, burstLength: Int = 1) = new BurstBuffer(
+trait BurstBufferTestHelpers {
+  protected val bufferConfig = Config(
     inAddrWidth = 8,
-    inDataWidth = inDataWidth,
+    inDataWidth = 8,
     outAddrWidth = 8,
-    outDataWidth = outDataWidth,
-    burstLength = burstLength
+    outDataWidth = 16,
+    burstLength = 1
   )
 
+  protected def mkBuffer(config: Config) = new BurstBuffer(config)
+}
+
+class BurstBufferTest extends AnyFlatSpec with ChiselScalatestTester with Matchers with BurstBufferTestHelpers {
   it should "buffer data (8:32)" in {
-    test(mkBuffer(8, 32)) { dut =>
+    test(mkBuffer(bufferConfig.copy(inDataWidth = 8, outDataWidth = 32))) { dut =>
       dut.io.in.wr.poke(true)
 
       // write 0
@@ -135,7 +139,7 @@ class BurstBufferTest extends AnyFlatSpec with ChiselScalatestTester with Matche
   }
 
   it should "buffer data (32:8)" in {
-    test(mkBuffer(32, 8, burstLength = 4)) { dut =>
+    test(mkBuffer(bufferConfig.copy(inDataWidth = 32, outDataWidth = 8, burstLength = 4))) { dut =>
       dut.io.in.wr.poke(true)
 
       // write 0
