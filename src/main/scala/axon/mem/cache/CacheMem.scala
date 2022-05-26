@@ -119,9 +119,20 @@ class CacheMem(config: Config) extends Module {
   val cacheEntryA = cacheEntryMemA.read(request.addr.index)
   val cacheEntryB = cacheEntryMemB.read(request.addr.index)
 
-  // Latch cache entry for the next way during the check state. This prevents the cache entry
+  // Latch cache entry for the current way during the check state. This prevents the cache entry
   // register from changing during a request.
   val cacheEntryReg = RegEnable(Mux(nextWay, cacheEntryB, cacheEntryA), stateReg === State.check)
+
+  // Write the cache entry
+  val nextCacheEntry = Mux(stateReg === State.write, cacheEntryReg, Entry.zero(config))
+
+  when(stateReg === State.init || (stateReg === State.write && !wayReg)) {
+    cacheEntryMemA.write(requestReg.addr.index, nextCacheEntry)
+  }
+
+  when(stateReg === State.init || (stateReg === State.write && wayReg)) {
+    cacheEntryMemB.write(requestReg.addr.index, nextCacheEntry)
+  }
 
   // Assert the burst counter enable signal as words are bursted from memory
   val burstCounterEnable = {
@@ -181,21 +192,6 @@ class CacheMem(config: Config) extends Module {
   when(stateReg === State.merge) {
     stateReg := State.write
     cacheEntryReg := cacheEntryReg.merge(offsetReg, dataReg)
-  }
-
-  // Write the cache entry
-  when(stateReg === State.write) {
-    when(wayReg) {
-      cacheEntryMemB.write(requestReg.addr.index, cacheEntryReg)
-    }.otherwise {
-      cacheEntryMemA.write(requestReg.addr.index, cacheEntryReg)
-    }
-  }
-
-  // Initialize the cache entries
-  when(stateReg === State.init) {
-    cacheEntryMemA.write(initCounter, Entry.zero(config))
-    cacheEntryMemB.write(initCounter, Entry.zero(config))
   }
 
   def onHit() = {
