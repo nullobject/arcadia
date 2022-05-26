@@ -57,23 +57,12 @@ class IOCTL extends Bundle {
   /** Output data bus */
   val dout = Input(Bits(IOCTL.DATA_WIDTH.W))
 
-  /** Converts DIP switch data to a synchronous write-only memory interface. */
-  def dips: WriteMemIO = {
-    val wire = Wire(WriteMemIO(IOCTL.ADDR_WIDTH, IOCTL.DATA_WIDTH))
-    wire.wr := download && wr && this.index === IOCTL.DIP_INDEX.U && !addr(IOCTL.ADDR_WIDTH - 1, 3).orR // ignore higher addresses
-    waitReq := false.B
-    wire.addr := addr
-    wire.mask := Fill(wire.maskWidth, 1.U)
-    wire.din := dout
-    din := 0.U
-    wire
-  }
-
   /** Converts ROM data to an asynchronous write-only memory interface. */
   def rom: AsyncWriteMemIO = {
+    val write = download && wr && this.index === IOCTL.ROM_INDEX.U
     val wire = Wire(AsyncWriteMemIO(IOCTL.ADDR_WIDTH, IOCTL.DATA_WIDTH))
-    wire.wr := download && wr && this.index === IOCTL.ROM_INDEX.U
-    waitReq := wire.waitReq
+    wire.wr := write
+    waitReq := write && wire.waitReq
     wire.addr := addr
     wire.mask := Fill(wire.maskWidth, 1.U)
     wire.din := dout
@@ -83,14 +72,28 @@ class IOCTL extends Bundle {
 
   /** Converts NVRAM data to an asynchronous read-write memory interface. */
   def nvram: AsyncReadWriteMemIO = {
+    val read = upload && rd && this.index === IOCTL.NVRAM_INDEX.U
+    val write = download && wr && this.index === IOCTL.NVRAM_INDEX.U
     val wire = Wire(AsyncReadWriteMemIO(IOCTL.ADDR_WIDTH, IOCTL.DATA_WIDTH))
-    wire.rd := upload && rd && this.index === IOCTL.NVRAM_INDEX.U
-    wire.wr := download && wr && this.index === IOCTL.NVRAM_INDEX.U
-    waitReq := wire.waitReq
+    wire.rd := read
+    wire.wr := write
+    waitReq := (read || write) && wire.waitReq
     wire.addr := addr
     wire.mask := Fill(wire.maskWidth, 1.U)
     wire.din := dout
     din := wire.dout
+    wire
+  }
+
+  /** Converts DIP switch data to a synchronous write-only memory interface. */
+  def dips: AsyncWriteMemIO = {
+    val wire = Wire(AsyncWriteMemIO(IOCTL.ADDR_WIDTH, IOCTL.DATA_WIDTH))
+    wire.wr := download && wr && this.index === IOCTL.DIP_INDEX.U && !addr(IOCTL.ADDR_WIDTH - 1, 3).orR // ignore higher addresses
+    waitReq := wire.waitReq
+    wire.addr := addr
+    wire.mask := Fill(wire.maskWidth, 1.U)
+    wire.din := dout
+    din := 0.U
     wire
   }
 }
