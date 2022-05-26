@@ -32,7 +32,7 @@
 
 package axon.mister
 
-import axon.mem.{AsyncWriteMemIO, WriteMemIO}
+import axon.mem._
 import chisel3._
 import chisel3.util._
 
@@ -78,6 +78,19 @@ class IOCTL extends Bundle {
     wire.mask := Fill(wire.maskWidth, 1.U)
     wire.din := dout
     din := 0.U
+    wire
+  }
+
+  /** Converts NVRAM data to an asynchronous read-write memory interface. */
+  def nvram: AsyncReadWriteMemIO = {
+    val wire = Wire(AsyncReadWriteMemIO(IOCTL.ADDR_WIDTH, IOCTL.DATA_WIDTH))
+    wire.rd := upload && rd && this.index === IOCTL.NVRAM_INDEX.U
+    wire.wr := download && wr && this.index === IOCTL.NVRAM_INDEX.U
+    waitReq := wire.waitReq
+    wire.addr := addr
+    wire.mask := Fill(wire.maskWidth, 1.U)
+    wire.din := dout
+    din := wire.dout
     wire
   }
 }
