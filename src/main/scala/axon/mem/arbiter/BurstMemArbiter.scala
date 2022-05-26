@@ -30,8 +30,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package axon.mem
+package axon.mem.arbiter
 
+import axon.mem.{BurstReadWriteMemIO, ConvertBurstMemIO}
 import chisel3._
 import chisel3.util._
 
@@ -42,7 +43,7 @@ import chisel3.util._
  * @param addrWidth The width of the address bus.
  * @param dataWidth The width of the data bus.
  */
-class MemArbiter(n: Int, addrWidth: Int, dataWidth: Int) extends Module {
+class BurstMemArbiter(n: Int, addrWidth: Int, dataWidth: Int) extends Module {
   val io = IO(new Bundle {
     /** Asserted when the arbiter has a pending request */
     val busy = Output(Bool())
@@ -94,5 +95,5 @@ class MemArbiter(n: Int, addrWidth: Int, dataWidth: Int) extends Module {
   io.chosen := chosen
   io.out <> BurstReadWriteMemIO.mux1H(chosen, io.in)
 
-  printf(p"MemArbiter(chosen: $chosen, busy: $busyReg)\n")
+  printf(p"BurstMemArbiter(chosen: $chosen, busy: $busyReg)\n")
 }
