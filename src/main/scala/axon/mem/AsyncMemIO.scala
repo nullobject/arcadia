@@ -202,31 +202,6 @@ object AsyncReadWriteMemIO {
   def apply(config: BusConfig) = new AsyncReadWriteMemIO(config)
 
   /**
-   * Demultiplexes requests from a single read-write memory interface to multiple read-write memory
-   * interfaces. The request is routed to the interface matching a given key.
-   *
-   * @param key  The key to used to select the interface.
-   * @param outs A list of key-interface pairs.
-   */
-  def demux[K <: UInt](key: K, outs: Seq[(K, AsyncReadWriteMemIO)]): AsyncReadWriteMemIO = {
-    val mem = Wire(chiselTypeOf(outs.head._2))
-    outs.foreach { case (k, out) =>
-      out.rd := k === key && mem.rd
-      out.wr := k === key && mem.wr
-      out.addr := mem.addr
-      out.mask := mem.mask
-      out.din := mem.din
-    }
-    val waitReqMap = outs.map(a => a._1 -> a._2.waitReq)
-    val validMap = outs.map(a => a._1 -> a._2.valid)
-    val doutMap = outs.map(a => a._1 -> a._2.dout)
-    mem.waitReq := MuxLookup(key, 0.U, waitReqMap)
-    mem.valid := MuxLookup(key, 0.U, validMap)
-    mem.dout := MuxLookup(key, 0.U, doutMap)
-    mem
-  }
-
-  /**
    * Multiplexes requests from multiple read-write memory interface to a single read-write memory
    * interface. The request is routed to the memory interface with the highest priority.
    *
