@@ -54,6 +54,29 @@ trait ValidIO {
 class AsyncReadMemIO(addrWidth: Int, dataWidth: Int) extends ReadMemIO(addrWidth, dataWidth) with WaitIO with ValidIO {
   def this(config: BusConfig) = this(config.addrWidth, config.dataWidth)
 
+  /** Converts the interface to synchronous read-only. */
+  def asReadMemIO: ReadMemIO = {
+    val mem = Wire(Flipped(ReadMemIO(this)))
+    mem.rd := rd
+    waitReq := false.B
+    valid := true.B
+    mem.addr := addr
+    dout := mem.dout
+    mem
+  }
+
+  /** Converts the interface to synchronous read-write. */
+  override def asReadWriteMemIO: ReadWriteMemIO = {
+    val mem = Wire(Flipped(ReadWriteMemIO(this)))
+    mem.rd := rd
+    mem.wr := false.B
+    waitReq := false.B
+    mem.addr := addr
+    mem.mask := DontCare
+    mem.din := DontCare
+    mem
+  }
+
   /**
    * Maps the address using the given function.
    *
@@ -65,17 +88,6 @@ class AsyncReadMemIO(addrWidth: Int, dataWidth: Int) extends ReadMemIO(addrWidth
     waitReq := mem.waitReq
     valid := mem.valid
     mem.addr := f(addr)
-    dout := mem.dout
-    mem
-  }
-
-  /** Converts the interface to synchronous read-write. */
-  def asReadMemIO: ReadMemIO = {
-    val mem = Wire(Flipped(ReadMemIO(this)))
-    mem.rd := rd
-    waitReq := false.B
-    valid := true.B
-    mem.addr := addr
     dout := mem.dout
     mem
   }
@@ -96,6 +108,18 @@ object AsyncReadMemIO {
 class AsyncWriteMemIO(addrWidth: Int, dataWidth: Int) extends WriteMemIO(addrWidth, dataWidth) with WaitIO {
   def this(config: BusConfig) = this(config.addrWidth, config.dataWidth)
 
+  /** Converts the interface to synchronous read-write. */
+  override def asReadWriteMemIO: ReadWriteMemIO = {
+    val mem = Wire(Flipped(ReadWriteMemIO(this)))
+    mem.rd := false.B
+    mem.wr := wr
+    waitReq := false.B
+    mem.addr := addr
+    mem.mask := mask
+    mem.din := din
+    mem
+  }
+
   /**
    * Maps the address using the given function.
    *
@@ -106,18 +130,6 @@ class AsyncWriteMemIO(addrWidth: Int, dataWidth: Int) extends WriteMemIO(addrWid
     mem.wr := wr
     waitReq := mem.waitReq
     mem.addr := f(addr)
-    mem.mask := mask
-    mem.din := din
-    mem
-  }
-
-  /** Converts the interface to synchronous read-write. */
-  def asReadWriteMemIO: ReadWriteMemIO = {
-    val mem = Wire(Flipped(ReadWriteMemIO(this)))
-    mem.rd := false.B
-    mem.wr := wr
-    waitReq := false.B
-    mem.addr := addr
     mem.mask := mask
     mem.din := din
     mem
