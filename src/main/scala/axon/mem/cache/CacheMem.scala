@@ -147,6 +147,7 @@ class CacheMem(config: Config) extends Module {
 
   // Control signals
   start := io.enable && request.valid && stateReg === State.idle
+  val waitReq = !(io.enable && stateReg === State.idle)
   val hitA = cacheEntryA.isHit(requestReg.addr)
   val hitB = cacheEntryB.isHit(requestReg.addr)
   val hit = hitA || hitB
@@ -263,7 +264,7 @@ class CacheMem(config: Config) extends Module {
   }
 
   // Outputs
-  io.in.waitReq := stateReg =/= State.idle
+  io.in.waitReq := waitReq
   io.in.valid := validReg
   io.in.dout := doutReg
   io.out.rd := stateReg === State.fill

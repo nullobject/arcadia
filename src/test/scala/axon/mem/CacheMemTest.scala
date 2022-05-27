@@ -259,12 +259,14 @@ class CacheMemTest extends AnyFlatSpec with ChiselScalatestTester with Matchers 
 
   behavior of "idle"
 
-  it should "deassert the wait signal" in {
+  it should "deassert the wait signal when the cache is enabled" in {
     test(mkCacheMem()) { dut =>
       dut.io.enable.poke(true)
       dut.io.in.waitReq.expect(true)
       waitForIdle(dut)
       dut.io.in.waitReq.expect(false)
+      dut.io.enable.poke(false)
+      dut.io.in.waitReq.expect(true)
     }
   }
 
