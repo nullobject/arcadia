@@ -105,6 +105,16 @@ object Util {
     }
 
   /**
+   * Reverses the byte ordering of the given value.
+   *
+   * @param bits The value to reverse.
+   */
+  def swapEndianness(bits: Bits): Bits = {
+    assert(bits.getWidth % 8 == 0, "Input data width must be divisible by 8")
+    decode(bits, bits.getWidth / 8, 8).reduce(_ ## _)
+  }
+
+  /**
    * Pads the words packed into a bitvector value.
    *
    * @param bits      The value.

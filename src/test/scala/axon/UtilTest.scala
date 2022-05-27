@@ -82,6 +82,19 @@ class UtilTest extends AnyFlatSpec with ChiselScalatestTester with Matchers {
     }
   }
 
+  "swapEndianness" should "reverse the byte ordering" in {
+    test(new Module {
+      val io = IO(new Bundle {
+        val a = Input(UInt(32.W))
+        val b = Output(UInt(32.W))
+      })
+      io.b := Util.swapEndianness(io.a)
+    }) { dut =>
+      dut.io.a.poke(0x12345678)
+      dut.io.b.expect(0x78563412)
+    }
+  }
+
   "padWords" should "pad words packed into a bitvector" in {
     test(new Module {
       val io = IO(new Bundle {
