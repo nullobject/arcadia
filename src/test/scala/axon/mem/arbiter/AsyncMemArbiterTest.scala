@@ -101,6 +101,16 @@ class AsyncMemArbiterTest extends AnyFlatSpec with ChiselScalatestTester with Ma
     }
   }
 
+  it should "assert not the wait signal when there are no requests" in {
+    test(mkMemArbiter) { dut =>
+      dut.io.in(0).waitReq.expect(false)
+      dut.io.in(1).waitReq.expect(false)
+      dut.io.in(0).rd.poke(true)
+      dut.io.in(0).waitReq.expect(false)
+      dut.io.in(1).waitReq.expect(true)
+    }
+  }
+
   it should "assert the valid signal" in {
     test(mkMemArbiter) { dut =>
       // read 0+1
