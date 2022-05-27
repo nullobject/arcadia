@@ -111,7 +111,6 @@ object Util {
    * @param n         The number of words.
    * @param fromWidth The width of the source words.
    * @param toWidth   The width of the destination words.
-   * @return
    */
   def padWords(bits: Bits, n: Int, fromWidth: Int, toWidth: Int): Bits =
     Cat(Util.decode(bits, n, fromWidth).map(_.pad(toWidth)).reverse)
