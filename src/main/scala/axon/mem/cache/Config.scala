@@ -37,17 +37,16 @@ import chisel3.util.log2Ceil
 /**
  * Represents the cache configuration.
  *
- * @param inAddrWidth    The width of the input address bus.
- * @param inDataWidth    The width of the input data bus.
- * @param outAddrWidth   The width of the output address bus.
- * @param outDataWidth   The width of the output data bus.
- * @param lineWidth      The number of words in a cache line.
- * @param depth          The number of entries in the cache.
- * @param wrapping       A boolean indicating whether burst wrapping should be enabled for the
- *                       cache. When a wrapping burst reaches a burst boundary, the address wraps
- *                       back to the previous burst boundary.
- * @param swapEndianness A boolean indicating whether the endianness of the input words should be
- *                       swapped.
+ * @param inAddrWidth  The width of the input address bus.
+ * @param inDataWidth  The width of the input data bus.
+ * @param outAddrWidth The width of the output address bus.
+ * @param outDataWidth The width of the output data bus.
+ * @param lineWidth    The number of words in a cache line.
+ * @param depth        The number of entries in the cache.
+ * @param wrapping     A boolean indicating whether burst wrapping should be enabled for the
+ *                     cache. When a wrapping burst reaches a burst boundary, the address wraps
+ *                     back to the previous burst boundary.
+ * @param bigEndian    A boolean indicating whether the memory uses big-endian byte ordering.
  */
 case class Config(inAddrWidth: Int,
                   inDataWidth: Int,
@@ -56,7 +55,7 @@ case class Config(inAddrWidth: Int,
                   lineWidth: Int,
                   depth: Int,
                   wrapping: Boolean = false,
-                  swapEndianness: Boolean = false) {
+                  bigEndian: Boolean = false) {
   /** The width of a cache address index */
   val indexWidth = log2Ceil(depth)
   /** The width of a cache address offset */

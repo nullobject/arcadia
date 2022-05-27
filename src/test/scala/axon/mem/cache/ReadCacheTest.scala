@@ -382,8 +382,8 @@ class ReadCacheTest extends AnyFlatSpec with ChiselScalatestTester with Matchers
     }
   }
 
-  it should "read (8:8) swap endianness" in {
-    test(mkCacheMem(cacheConfig.copy(inDataWidth = 8, outDataWidth = 8, swapEndianness = true))) { dut =>
+  it should "read (8:8) big-endian" in {
+    test(mkCacheMem(cacheConfig.copy(inDataWidth = 8, outDataWidth = 8, bigEndian = true))) { dut =>
       dut.io.enable.poke(true)
       fillCacheLine(dut, 0, Seq(0x12, 0x34))
       readCache(dut, 0) shouldBe 0x12
@@ -428,8 +428,8 @@ class ReadCacheTest extends AnyFlatSpec with ChiselScalatestTester with Matchers
     }
   }
 
-  it should "read (16:64) swap endianness" in {
-    test(mkCacheMem(cacheConfig.copy(inDataWidth = 16, outDataWidth = 64, lineWidth = 1, swapEndianness = true))) { dut =>
+  it should "read (16:64) big-endian" in {
+    test(mkCacheMem(cacheConfig.copy(inDataWidth = 16, outDataWidth = 64, lineWidth = 1, bigEndian = true))) { dut =>
       dut.io.enable.poke(true)
       fillCacheLine(dut, 0.U, Seq("h_efcdab90_78563412".U))
       readCache(dut, 0) shouldBe 0x3412
@@ -456,8 +456,8 @@ class ReadCacheTest extends AnyFlatSpec with ChiselScalatestTester with Matchers
     }
   }
 
-  it should "read (16:16) swap endianness" in {
-    test(mkCacheMem(cacheConfig.copy(inDataWidth = 16, outDataWidth = 16, swapEndianness = true))) { dut =>
+  it should "read (16:16) big-endian" in {
+    test(mkCacheMem(cacheConfig.copy(inDataWidth = 16, outDataWidth = 16, bigEndian = true))) { dut =>
       dut.io.enable.poke(true)
       fillCacheLine(dut, 0, Seq(0x3412, 0x7856))
       readCache(dut, 0) shouldBe 0x3412
