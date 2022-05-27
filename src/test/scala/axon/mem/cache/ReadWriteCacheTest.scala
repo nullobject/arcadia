@@ -876,28 +876,31 @@ class ReadWriteCacheTest extends AnyFlatSpec with ChiselScalatestTester with Mat
 
   behavior of "data width ratios"
 
-  it should "read a word (8:8)" in {
+  it should "read/write (8:8)" in {
     test(mkCacheMem(cacheConfig.copy(inDataWidth = 8, outDataWidth = 8))) { dut =>
       dut.io.enable.poke(true)
       fillCacheLine(dut, 0, Seq(0x12, 0x34))
+      writeCache(dut, 0, 0x12)
       readCache(dut, 0) shouldBe 0x12
       readCache(dut, 1) shouldBe 0x34
     }
   }
 
-  it should "read a word (8:8) swap endianness" in {
+  it should "read/write (8:8) swap endianness" in {
     test(mkCacheMem(cacheConfig.copy(inDataWidth = 8, outDataWidth = 8, swapEndianness = true))) { dut =>
       dut.io.enable.poke(true)
       fillCacheLine(dut, 0, Seq(0x12, 0x34))
+      writeCache(dut, 0, 0x12)
       readCache(dut, 0) shouldBe 0x12
       readCache(dut, 1) shouldBe 0x34
     }
   }
 
-  it should "read a word (8:16)" in {
+  it should "read/write (8:16)" in {
     test(mkCacheMem(cacheConfig.copy(inDataWidth = 8, outDataWidth = 16))) { dut =>
       dut.io.enable.poke(true)
       fillCacheLine(dut, 0, Seq(0x3412, 0x7856))
+      writeCache(dut, 0, 0x12)
       readCache(dut, 0) shouldBe 0x12
       readCache(dut, 1) shouldBe 0x34
       readCache(dut, 2) shouldBe 0x56
@@ -905,10 +908,11 @@ class ReadWriteCacheTest extends AnyFlatSpec with ChiselScalatestTester with Mat
     }
   }
 
-  it should "read a word (8:32)" in {
+  it should "read/write (8:32)" in {
     test(mkCacheMem(cacheConfig.copy(inDataWidth = 8, outDataWidth = 32))) { dut =>
       dut.io.enable.poke(true)
       fillCacheLine(dut, 0.U, Seq("h_78563412".U, "h_efcdab90".U))
+      writeCache(dut, 0, 0x12)
       readCache(dut, 0) shouldBe 0x12
       readCache(dut, 1) shouldBe 0x34
       readCache(dut, 2) shouldBe 0x56
@@ -920,10 +924,11 @@ class ReadWriteCacheTest extends AnyFlatSpec with ChiselScalatestTester with Mat
     }
   }
 
-  it should "read a word (16:64)" in {
+  it should "read/write (16:64)" in {
     test(mkCacheMem(cacheConfig.copy(inDataWidth = 16, outDataWidth = 64, lineWidth = 1))) { dut =>
       dut.io.enable.poke(true)
       fillCacheLine(dut, 0.U, Seq("h_efcdab90_78563412".U))
+      writeCache(dut, 0, 0x1234)
       readCache(dut, 0) shouldBe 0x1234
       readCache(dut, 2) shouldBe 0x5678
       readCache(dut, 4) shouldBe 0x90ab
@@ -931,10 +936,11 @@ class ReadWriteCacheTest extends AnyFlatSpec with ChiselScalatestTester with Mat
     }
   }
 
-  it should "read a word (16:64) swap endianness" in {
+  it should "read/write (16:64) swap endianness" in {
     test(mkCacheMem(cacheConfig.copy(inDataWidth = 16, outDataWidth = 64, lineWidth = 1, swapEndianness = true))) { dut =>
       dut.io.enable.poke(true)
       fillCacheLine(dut, 0.U, Seq("h_efcdab90_78563412".U))
+      writeCache(dut, 0, 0x3412)
       readCache(dut, 0) shouldBe 0x3412
       readCache(dut, 2) shouldBe 0x7856
       readCache(dut, 4) shouldBe 0xab90
@@ -942,27 +948,30 @@ class ReadWriteCacheTest extends AnyFlatSpec with ChiselScalatestTester with Mat
     }
   }
 
-  it should "read a word (16:8)" in {
+  it should "read/write (16:8)" in {
     test(mkCacheMem(cacheConfig.copy(inDataWidth = 16, outDataWidth = 8))) { dut =>
       dut.io.enable.poke(true)
       fillCacheLine(dut, 0, Seq(0x12, 0x34))
+      writeCache(dut, 0, 0x1234)
       readCache(dut, 0) shouldBe 0x1234
     }
   }
 
-  it should "read a word (16:16)" in {
+  it should "read/write (16:16)" in {
     test(mkCacheMem(cacheConfig.copy(inDataWidth = 16, outDataWidth = 16))) { dut =>
       dut.io.enable.poke(true)
       fillCacheLine(dut, 0, Seq(0x3412, 0x7856))
+      writeCache(dut, 0, 0x1234)
       readCache(dut, 0) shouldBe 0x1234
       readCache(dut, 2) shouldBe 0x5678
     }
   }
 
-  it should "read a word (16:16) swap endianness" in {
+  it should "read/write (16:16) swap endianness" in {
     test(mkCacheMem(cacheConfig.copy(inDataWidth = 16, outDataWidth = 16, swapEndianness = true))) { dut =>
       dut.io.enable.poke(true)
       fillCacheLine(dut, 0, Seq(0x3412, 0x7856))
+      writeCache(dut, 0, 0x3412)
       readCache(dut, 0) shouldBe 0x3412
       readCache(dut, 2) shouldBe 0x7856
     }

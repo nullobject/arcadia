@@ -32,6 +32,7 @@
 
 package axon.mem.cache
 
+import axon.Util
 import chisel3._
 
 /**
@@ -68,7 +69,8 @@ class Entry(private val config: Config) extends Bundle {
    *
    * @param offset The address offset.
    */
-  def inWord(offset: UInt): Bits = line.inWords(offset)
+  def inWord(offset: UInt): Bits =
+    if (config.swapEndianness) line.inWords(offset) else Util.swapEndianness(line.inWords(offset))
 
   /**
    * Returns the output word at the given offset.
@@ -103,7 +105,7 @@ class Entry(private val config: Config) extends Bundle {
    */
   def merge(offset: UInt, data: Bits): Entry = {
     val words = WireInit(line.inWords)
-    words(offset) := data
+    words(offset) := (if (config.swapEndianness) data else Util.swapEndianness(data))
 
     val entry = Wire(new Entry(config))
     entry := this
