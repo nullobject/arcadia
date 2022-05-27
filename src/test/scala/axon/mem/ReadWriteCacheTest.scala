@@ -32,14 +32,14 @@
 
 package axon.mem
 
-import axon.mem.cache.{CacheMem, Config}
+import axon.mem.cache.{ReadWriteCache, Config}
 import chisel3._
 import chiseltest._
 import org.scalatest._
 import flatspec.AnyFlatSpec
 import matchers.should.Matchers
 
-trait CacheMemTestHelpers {
+trait ReadWriteCacheTestHelpers {
   protected val cacheConfig = Config(
     inAddrWidth = 16,
     inDataWidth = 8,
@@ -49,9 +49,9 @@ trait CacheMemTestHelpers {
     depth = 8
   )
 
-  protected def mkCacheMem(config: Config = cacheConfig) = new CacheMem(config)
+  protected def mkCacheMem(config: Config = cacheConfig) = new ReadWriteCache(config)
 
-  protected def readCache(dut: CacheMem, addr: Int) = {
+  protected def readCache(dut: ReadWriteCache, addr: Int) = {
     dut.io.enable.poke(true)
     waitForIdle(dut)
     dut.io.in.rd.poke(true)
@@ -65,7 +65,7 @@ trait CacheMemTestHelpers {
     result
   }
 
-  protected def writeCache(dut: CacheMem, addr: Int, data: Int = 0) = {
+  protected def writeCache(dut: ReadWriteCache, addr: Int, data: Int = 0) = {
     dut.io.enable.poke(true)
     waitForIdle(dut)
     dut.io.in.rd.poke(false)
@@ -77,7 +77,7 @@ trait CacheMemTestHelpers {
     waitForIdle(dut)
   }
 
-  protected def fillCacheLine(dut: CacheMem, addr: UInt, data: Seq[UInt]): Unit = {
+  protected def fillCacheLine(dut: ReadWriteCache, addr: UInt, data: Seq[UInt]): Unit = {
     dut.io.enable.poke(true)
     waitForIdle(dut)
     dut.io.in.rd.poke(true)
@@ -98,41 +98,41 @@ trait CacheMemTestHelpers {
     waitForIdle(dut)
   }
 
-  protected def fillCacheLine(dut: CacheMem, addr: Int, data: Seq[Int]): Unit = {
+  protected def fillCacheLine(dut: ReadWriteCache, addr: Int, data: Seq[Int]): Unit = {
     fillCacheLine(dut, addr.U, data.map(_.U))
   }
 
-  protected def waitForRequest(dut: CacheMem) = {
+  protected def waitForRequest(dut: ReadWriteCache) = {
     dut.clock.step()
     waitForIdle(dut)
   }
 
-  protected def waitForIdle(dut: CacheMem) =
+  protected def waitForIdle(dut: ReadWriteCache) =
     while (!dut.io.debug.idle.peekBoolean()) { dut.clock.step() }
 
-  protected def waitForCheck(dut: CacheMem) =
+  protected def waitForCheck(dut: ReadWriteCache) =
     while (!dut.io.debug.check.peekBoolean()) { dut.clock.step() }
 
-  protected def waitForFill(dut: CacheMem) =
+  protected def waitForFill(dut: ReadWriteCache) =
     while (!dut.io.debug.fill.peekBoolean()) { dut.clock.step() }
 
-  protected def waitForFillWait(dut: CacheMem) =
+  protected def waitForFillWait(dut: ReadWriteCache) =
     while (!dut.io.debug.fillWait.peekBoolean()) { dut.clock.step() }
 
-  protected def waitForEvict(dut: CacheMem) =
+  protected def waitForEvict(dut: ReadWriteCache) =
     while (!dut.io.debug.evict.peekBoolean()) { dut.clock.step() }
 
-  protected def waitForEvictWait(dut: CacheMem) =
+  protected def waitForEvictWait(dut: ReadWriteCache) =
     while (!dut.io.debug.evictWait.peekBoolean()) { dut.clock.step() }
 
-  protected def waitForMerge(dut: CacheMem) =
+  protected def waitForMerge(dut: ReadWriteCache) =
     while (!dut.io.debug.merge.peekBoolean()) { dut.clock.step() }
 
-  protected def waitForWrite(dut: CacheMem) =
+  protected def waitForWrite(dut: ReadWriteCache) =
     while (!dut.io.debug.write.peekBoolean()) { dut.clock.step() }
 }
 
-class CacheMemTest extends AnyFlatSpec with ChiselScalatestTester with Matchers with CacheMemTestHelpers {
+class ReadWriteCacheTest extends AnyFlatSpec with ChiselScalatestTester with Matchers with ReadWriteCacheTestHelpers {
   behavior of "FSM"
 
   it should "not move to the check state when the cache is disabled" in {
