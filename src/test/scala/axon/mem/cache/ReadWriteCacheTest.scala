@@ -30,14 +30,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package axon.mem
+package axon.mem.cache
 
-import axon.mem.cache.{ReadWriteCache, Config}
 import chisel3._
 import chiseltest._
-import org.scalatest._
-import flatspec.AnyFlatSpec
-import matchers.should.Matchers
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
 trait ReadWriteCacheTestHelpers {
   protected val cacheConfig = Config(
