@@ -81,7 +81,7 @@ class IOCTL extends Bundle {
     wire.addr := addr
     wire.mask := Fill(wire.maskWidth, 1.U)
     wire.din := dout
-    din := wire.dout
+    din := RegEnable(wire.dout, wire.valid)
     wire
   }
 
