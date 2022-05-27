@@ -80,7 +80,7 @@ class AsyncMemArbiter(n: Int, addrWidth: Int, dataWidth: Int) extends Module {
   val chosen = Mux(busyReg, indexReg, index)
 
   // Assert the effective request signal when a request is accepted by the output port
-  val effectiveRead = !busyReg && index.orR && io.out.rd && !io.out.waitReq
+  val effectiveRead = !busyReg && io.out.rd && !io.out.waitReq
 
   // Toggle the busy register
   when(io.out.valid) {
