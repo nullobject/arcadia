@@ -876,7 +876,7 @@ class ReadWriteCacheTest extends AnyFlatSpec with ChiselScalatestTester with Mat
 
   behavior of "data width ratios"
 
-  it should "read/write (8:8)" in {
+  it should "read/write data (8:8)" in {
     test(mkCacheMem(cacheConfig.copy(inDataWidth = 8, outDataWidth = 8))) { dut =>
       dut.io.enable.poke(true)
       fillCacheLine(dut, 0, Seq(0x12, 0x34))
@@ -886,17 +886,7 @@ class ReadWriteCacheTest extends AnyFlatSpec with ChiselScalatestTester with Mat
     }
   }
 
-  it should "read/write (8:8) big-endian" in {
-    test(mkCacheMem(cacheConfig.copy(inDataWidth = 8, outDataWidth = 8, bigEndian = true))) { dut =>
-      dut.io.enable.poke(true)
-      fillCacheLine(dut, 0, Seq(0x12, 0x34))
-      writeCache(dut, 0, 0x12)
-      readCache(dut, 0) shouldBe 0x12
-      readCache(dut, 1) shouldBe 0x34
-    }
-  }
-
-  it should "read/write (8:16)" in {
+  it should "read/write data (8:16)" in {
     test(mkCacheMem(cacheConfig.copy(inDataWidth = 8, outDataWidth = 16))) { dut =>
       dut.io.enable.poke(true)
       fillCacheLine(dut, 0, Seq(0x3412, 0x7856))
@@ -908,7 +898,7 @@ class ReadWriteCacheTest extends AnyFlatSpec with ChiselScalatestTester with Mat
     }
   }
 
-  it should "read/write (8:32)" in {
+  it should "read/write data (8:32)" in {
     test(mkCacheMem(cacheConfig.copy(inDataWidth = 8, outDataWidth = 32))) { dut =>
       dut.io.enable.poke(true)
       fillCacheLine(dut, 0.U, Seq("h_78563412".U, "h_efcdab90".U))
@@ -924,31 +914,7 @@ class ReadWriteCacheTest extends AnyFlatSpec with ChiselScalatestTester with Mat
     }
   }
 
-  it should "read/write (16:64)" in {
-    test(mkCacheMem(cacheConfig.copy(inDataWidth = 16, outDataWidth = 64, lineWidth = 1))) { dut =>
-      dut.io.enable.poke(true)
-      fillCacheLine(dut, 0.U, Seq("h_efcdab90_78563412".U))
-      writeCache(dut, 0, 0x1234)
-      readCache(dut, 0) shouldBe 0x1234
-      readCache(dut, 2) shouldBe 0x5678
-      readCache(dut, 4) shouldBe 0x90ab
-      readCache(dut, 6) shouldBe 0xcdef
-    }
-  }
-
-  it should "read/write (16:64) big-endian" in {
-    test(mkCacheMem(cacheConfig.copy(inDataWidth = 16, outDataWidth = 64, lineWidth = 1, bigEndian = true))) { dut =>
-      dut.io.enable.poke(true)
-      fillCacheLine(dut, 0.U, Seq("h_efcdab90_78563412".U))
-      writeCache(dut, 0, 0x3412)
-      readCache(dut, 0) shouldBe 0x3412
-      readCache(dut, 2) shouldBe 0x7856
-      readCache(dut, 4) shouldBe 0xab90
-      readCache(dut, 6) shouldBe 0xefcd
-    }
-  }
-
-  it should "read/write (16:8)" in {
+  it should "read/write data (16:8)" in {
     test(mkCacheMem(cacheConfig.copy(inDataWidth = 16, outDataWidth = 8))) { dut =>
       dut.io.enable.poke(true)
       fillCacheLine(dut, 0, Seq(0x12, 0x34))
@@ -957,7 +923,7 @@ class ReadWriteCacheTest extends AnyFlatSpec with ChiselScalatestTester with Mat
     }
   }
 
-  it should "read/write (16:16)" in {
+  it should "read/write data (16:16)" in {
     test(mkCacheMem(cacheConfig.copy(inDataWidth = 16, outDataWidth = 16))) { dut =>
       dut.io.enable.poke(true)
       fillCacheLine(dut, 0, Seq(0x3412, 0x7856))
@@ -967,13 +933,13 @@ class ReadWriteCacheTest extends AnyFlatSpec with ChiselScalatestTester with Mat
     }
   }
 
-  it should "read/write (16:16) big-endian" in {
-    test(mkCacheMem(cacheConfig.copy(inDataWidth = 16, outDataWidth = 16, bigEndian = true))) { dut =>
+  it should "read/write data (16:32)" in {
+    test(mkCacheMem(cacheConfig.copy(inDataWidth = 16, outDataWidth = 32, lineWidth = 1))) { dut =>
       dut.io.enable.poke(true)
-      fillCacheLine(dut, 0, Seq(0x3412, 0x7856))
-      writeCache(dut, 0, 0x3412)
-      readCache(dut, 0) shouldBe 0x3412
-      readCache(dut, 2) shouldBe 0x7856
+      fillCacheLine(dut, 0.U, Seq("h_78563412".U))
+      writeCache(dut, 0, 0x1234)
+      readCache(dut, 0) shouldBe 0x1234
+      readCache(dut, 2) shouldBe 0x5678
     }
   }
 }

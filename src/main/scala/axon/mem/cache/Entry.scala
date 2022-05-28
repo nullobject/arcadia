@@ -69,8 +69,7 @@ class Entry(private val config: Config) extends Bundle {
    *
    * @param offset The address offset.
    */
-  def inWord(offset: UInt): Bits =
-    if (config.bigEndian) line.inWords(offset) else Util.swapEndianness(line.inWords(offset))
+  def inWord(offset: UInt): Bits = Util.swapEndianness(line.inWords(offset))
 
   /**
    * Returns the output word at the given offset.
@@ -105,7 +104,7 @@ class Entry(private val config: Config) extends Bundle {
    */
   def merge(offset: UInt, data: Bits): Entry = {
     val words = WireInit(line.inWords)
-    words(offset) := (if (config.bigEndian) data else Util.swapEndianness(data))
+    words(offset) := Util.swapEndianness(data)
 
     val entry = Wire(new Entry(config))
     entry := this

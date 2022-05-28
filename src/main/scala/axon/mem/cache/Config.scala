@@ -46,7 +46,6 @@ import chisel3.util.log2Ceil
  * @param wrapping     A boolean indicating whether burst wrapping should be enabled for the
  *                     cache. When a wrapping burst reaches a burst boundary, the address wraps
  *                     back to the previous burst boundary.
- * @param bigEndian    A boolean indicating whether the memory uses big-endian byte ordering.
  */
 case class Config(inAddrWidth: Int,
                   inDataWidth: Int,
@@ -54,8 +53,7 @@ case class Config(inAddrWidth: Int,
                   outDataWidth: Int,
                   lineWidth: Int,
                   depth: Int,
-                  wrapping: Boolean = false,
-                  bigEndian: Boolean = false) {
+                  wrapping: Boolean = false) {
   /** The width of a cache address index */
   val indexWidth = log2Ceil(depth)
   /** The width of a cache address offset */
