@@ -32,6 +32,7 @@
 
 package axon.mem.buffer
 
+import axon.Util
 import axon.mem.{AsyncWriteMemIO, BurstWriteMemIO}
 import axon.util.Counter
 import chisel3._
@@ -64,6 +65,12 @@ class BurstBuffer(config: Config) extends Module {
   val (wordCounter, wordCounterWrap) = Counter.static(config.inWords, enable = latch)
   val (burstCounter, burstCounterWrap) = Counter.static(config.burstLength, enable = effectiveWrite)
 
+  // Data out
+  val dout = {
+    val data = lineReg.outWords(burstCounter)
+    if (config.bigEndian) Util.swapEndianness(data) else data
+  }
+
   // Toggle write pending register
   when(io.out.burstDone) {
     writePendingReg := false.B
@@ -84,8 +91,8 @@ class BurstBuffer(config: Config) extends Module {
   io.out.wr := writePendingReg
   io.out.burstLength := config.burstLength.U
   io.out.addr := (addrReg >> log2Ceil(config.outBytes)) << log2Ceil(config.outBytes)
-  io.out.din := lineReg.outWords(burstCounter)
+  io.out.din := dout
   io.out.mask := Fill(config.outBytes, 1.U)
 
-  printf(p"(busy: $writePendingReg, addr: ${ io.out.addr }, wordCounter: $wordCounter ($wordCounterWrap), burstCounter: $burstCounter ($burstCounterWrap), line: 0x${ Hexadecimal(lineReg.words.asUInt) })\n")
+  printf(p"BurstBuffer(busy: $writePendingReg, addr: ${ io.out.addr }, wordCounter: $wordCounter ($wordCounterWrap), burstCounter: $burstCounter ($burstCounterWrap), line: 0x${ Hexadecimal(lineReg.words.asUInt) })\n")
 }

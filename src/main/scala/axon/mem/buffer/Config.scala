@@ -40,7 +40,7 @@ package axon.mem.buffer
  * @param outAddrWidth   The width of the output address bus.
  * @param outDataWidth   The width of the output data bus.
  * @param burstLength    The number of words to transfer during a burst.
- * @param swapEndianness A boolean indicating whether the endianness of the input words should be
+ * @param bigEndian A boolean indicating whether the endianness of the input words should be
  *                       swapped.
  */
 case class Config(inAddrWidth: Int,
@@ -48,7 +48,7 @@ case class Config(inAddrWidth: Int,
                   outAddrWidth: Int,
                   outDataWidth: Int,
                   burstLength: Int,
-                  swapEndianness: Boolean = false) {
+                  bigEndian: Boolean = false) {
   /** The number of input words in a cache line */
   val inWords = outDataWidth * burstLength / inDataWidth
   /** The number of bytes in an input word */
