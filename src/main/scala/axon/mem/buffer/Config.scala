@@ -47,7 +47,7 @@ case class Config(inAddrWidth: Int,
                   inDataWidth: Int,
                   outAddrWidth: Int,
                   outDataWidth: Int,
-                  burstLength: Int,
+                  burstLength: Int = 1,
                   bigEndian: Boolean = false) {
   /** The number of input words in a cache line */
   val inWords = outDataWidth * burstLength / inDataWidth
