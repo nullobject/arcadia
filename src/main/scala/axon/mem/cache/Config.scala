@@ -32,10 +32,11 @@
 
 package axon.mem.cache
 
+import axon.mem.LineConfig
 import chisel3.util.log2Ceil
 
 /**
- * Represents the cache configuration.
+ * Represents a cache configuration.
  *
  * @param inAddrWidth  The width of the input address bus.
  * @param inDataWidth  The width of the input data bus.
@@ -47,25 +48,19 @@ import chisel3.util.log2Ceil
  *                     cache. When a wrapping burst reaches a burst boundary, the address wraps
  *                     back to the previous burst boundary.
  */
-case class Config(inAddrWidth: Int,
-                  inDataWidth: Int,
-                  outAddrWidth: Int,
-                  outDataWidth: Int,
-                  lineWidth: Int,
+case class Config(override val inAddrWidth: Int,
+                  override val inDataWidth: Int,
+                  override val outAddrWidth: Int,
+                  override val outDataWidth: Int,
+                  override val lineWidth: Int,
                   depth: Int,
-                  wrapping: Boolean = false) {
+                  wrapping: Boolean = false) extends LineConfig(inAddrWidth, inDataWidth, outAddrWidth, outDataWidth, lineWidth) {
   /** The width of a cache address index */
   val indexWidth = log2Ceil(depth)
   /** The width of a cache address offset */
   val offsetWidth = log2Ceil(lineWidth)
   /** The width of a cache tag */
   val tagWidth = inAddrWidth - indexWidth - offsetWidth
-  /** The number of input words in a cache line */
-  val inWords = outDataWidth * lineWidth / inDataWidth
-  /** The number of bytes in an input word */
-  val inBytes = inDataWidth / 8
-  /** The number of bytes in an output word */
-  val outBytes = outDataWidth / 8
   /** The number of output words that fit into a single input word */
   val inOutDataWidthRatio = if (inDataWidth > outDataWidth) inDataWidth / outDataWidth else 1
 }

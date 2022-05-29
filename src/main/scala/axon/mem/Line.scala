@@ -30,29 +30,56 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package axon.mem.cache
+package axon.mem
 
 import axon.Util
 import chisel3._
 
 /**
- * A cache line is stored internally as a vector of words that has the same width as the output data
- * bus.
+ * Represents a line configuration.
  *
- * A cache line can also be represented a vector of input words, by rearranging the byte grouping.
- *
- * @param config The cache configuration.
+ * @param inAddrWidth  The width of the input address bus.
+ * @param inDataWidth  The width of the input data bus.
+ * @param outAddrWidth The width of the output address bus.
+ * @param outDataWidth The width of the output data bus.
+ * @param lineWidth    The number of words in a line.
  */
-class Line(private val config: Config) extends Bundle {
-  /** The cache line data */
+abstract class LineConfig(val inAddrWidth: Int,
+                          val inDataWidth: Int,
+                          val outAddrWidth: Int,
+                          val outDataWidth: Int,
+                          val lineWidth: Int) {
+  /** The number of input words in a line */
+  val inWords = outDataWidth * lineWidth / inDataWidth
+  /** The number of bytes in an input word */
+  val inBytes = inDataWidth / 8
+  /** The number of bytes in an output word */
+  val outBytes = outDataWidth / 8
+}
+
+/**
+ * A line is a set of words that can be viewed as two different groupings: in words and out words.
+ *
+ * @param config The line configuration.
+ */
+class Line(private val config: LineConfig) extends Bundle {
+  /** Raw line data */
   val words: Vec[Bits] = Vec(config.lineWidth, Bits(config.outDataWidth.W))
 
-  /** Returns the cache line represented as a vector input words */
+  /**
+   * Returns the line represented as a vector input words.
+   *
+   * @return A vector of words.
+   */
   def inWords: Vec[Bits] = {
     val ws = Util.decode(words.asUInt, config.inWords, config.inDataWidth)
     VecInit(ws)
   }
 
-  /** The output words in the cache line */
+  /**
+   * Returns the line represented as a vector output words.
+   *
+   * @return A vector of words.
+   */
   def outWords: Vec[Bits] = words
 }
