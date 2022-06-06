@@ -30,10 +30,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package axon.snd
+package axon.snd.ymz
 
 import axon.Util
 import axon.mem.AsyncReadMemIO
+import axon.snd.{Audio, YMZ280BConfig}
 import axon.util.Counter
 import chisel3._
 import chisel3.util._

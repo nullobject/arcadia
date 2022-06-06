@@ -30,30 +30,38 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package axon.snd
+package axon.snd.ymz
 
 import chisel3._
-import chiseltest._
-import org.scalatest._
-import flatspec.AnyFlatSpec
-import matchers.should.Matchers
+import chisel3.util._
 
-class ADPCMTest extends AnyFlatSpec with ChiselScalatestTester with Matchers {
-  it should "decode sample values" in {
-    test(new ADPCM) { dut =>
-      dut.io.data.poke(8)
-      dut.io.in.step.poke(127)
-      dut.io.in.sample.poke(0)
-      dut.clock.step()
-      dut.io.out.step.expect(127.S)
-      dut.io.out.sample.expect(-16.S)
+/** Represents the utility register. */
+class UtilReg extends Bundle {
+  /** IRQ mask */
+  val irqMask = Bits(8.W)
+  /** Flags */
+  val flags = new Bundle {
+    /** Key on enable */
+    val keyOnEnable = Bool()
+    /** Memory enable */
+    val memEnable = Bool()
+    /** IRQ enable */
+    val irqEnable = Bool()
+  }
+}
 
-      dut.io.data.poke(7)
-      dut.io.in.step.poke(127)
-      dut.io.in.sample.poke(-16)
-      dut.clock.step()
-      dut.io.out.step.expect(304.S)
-      dut.io.out.sample.expect(222.S)
-    }
+object UtilReg {
+  /**
+   * Decodes a utility register from the given register file.
+   *
+   * @param registerFile The register file.
+   */
+  def fromRegisterFile(registerFile: Vec[UInt]): UtilReg = {
+    Cat(
+      registerFile(0xfe), // IRQ mask
+      registerFile(0xff)(7), // key on enable
+      registerFile(0xff)(6), // memory enable
+      registerFile(0xff)(4), // IRQ enable
+    ).asTypeOf(new UtilReg)
   }
 }

@@ -34,9 +34,8 @@ package axon.snd
 
 import chisel3._
 import chiseltest._
-import org.scalatest._
-import flatspec.AnyFlatSpec
-import matchers.should.Matchers
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
 trait YMZ280BTestHelpers {
   protected val config = YMZ280BConfig(clockFreq = 44100, numChannels = 2)

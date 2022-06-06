@@ -30,38 +30,28 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package axon.snd
+package axon.snd.ymz
 
 import chisel3._
-import chisel3.util._
 
-/** Represents the utility register. */
-class UtilReg extends Bundle {
-  /** IRQ mask */
-  val irqMask = Bits(8.W)
-  /** Flags */
-  val flags = new Bundle {
-    /** Key on enable */
-    val keyOnEnable = Bool()
-    /** Memory enable */
-    val memEnable = Bool()
-    /** IRQ enable */
-    val irqEnable = Bool()
-  }
-}
+/**
+ * Interpolates sample values.
+ *
+ * @param sampleWidth The width of the sample words.
+ * @param indexWidth  The width of the interpolation index.
+ */
+class LERP(sampleWidth: Int = 16, indexWidth: Int = 9) extends Module {
+  val io = IO(new Bundle {
+    /** Input sample values */
+    val samples = Input(Vec(2, SInt(sampleWidth.W)))
+    /** Interpolation index */
+    val index = Input(UInt(indexWidth.W))
+    /** Output sample value */
+    val out = Output(SInt(sampleWidth.W))
+  })
 
-object UtilReg {
-  /**
-   * Decodes a utility register from the given register file.
-   *
-   * @param registerFile The register file.
-   */
-  def fromRegisterFile(registerFile: Vec[UInt]): UtilReg = {
-    Cat(
-      registerFile(0xfe), // IRQ mask
-      registerFile(0xff)(7), // key on enable
-      registerFile(0xff)(6), // memory enable
-      registerFile(0xff)(4), // IRQ enable
-    ).asTypeOf(new UtilReg)
-  }
+  // Calculate interpolated sample value
+  val slope = io.samples(1) -& io.samples(0)
+  val offset = io.index * slope
+  io.out := offset(sampleWidth + indexWidth - 2, indexWidth - 1).asSInt + io.samples(0)
 }

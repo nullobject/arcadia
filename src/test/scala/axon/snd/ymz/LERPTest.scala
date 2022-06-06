@@ -30,28 +30,50 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package axon.snd
+package axon.snd.ymz
 
 import chisel3._
+import chiseltest._
+import org.scalatest._
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-/**
- * Interpolates sample values.
- *
- * @param sampleWidth The width of the sample words.
- * @param indexWidth  The width of the interpolation index.
- */
-class LERP(sampleWidth: Int = 16, indexWidth: Int = 9) extends Module {
-  val io = IO(new Bundle {
-    /** Input sample values */
-    val samples = Input(Vec(2, SInt(sampleWidth.W)))
-    /** Interpolation index */
-    val index = Input(UInt(indexWidth.W))
-    /** Output sample value */
-    val out = Output(SInt(sampleWidth.W))
-  })
+class LERPTest extends AnyFlatSpec with ChiselScalatestTester with Matchers {
+  it should "interpolate sample values" in {
+    test(new LERP) { dut =>
+      dut.io.samples(0).poke(0)
+      dut.io.samples(1).poke(16)
 
-  // Calculate interpolated sample value
-  val slope = io.samples(1) -& io.samples(0)
-  val offset = io.index * slope
-  io.out := offset(sampleWidth + indexWidth - 2, indexWidth - 1).asSInt + io.samples(0)
+      dut.io.index.poke(0)
+      dut.io.out.expect(0.S)
+
+      dut.io.index.poke(64)
+      dut.io.out.expect(4.S)
+
+      dut.io.index.poke(128)
+      dut.io.out.expect(8.S)
+
+      dut.io.index.poke(192)
+      dut.io.out.expect(12.S)
+
+      dut.io.index.poke(256)
+      dut.io.out.expect(16.S)
+    }
+  }
+
+  it should "handle min/max sample values" in {
+    test(new LERP) { dut =>
+      dut.io.samples(0).poke(-32767)
+      dut.io.samples(1).poke(32767)
+
+      dut.io.index.poke(0)
+      dut.io.out.expect(-32767.S)
+
+      dut.io.index.poke(128)
+      dut.io.out.expect(0.S)
+
+      dut.io.index.poke(256)
+      dut.io.out.expect(32767.S)
+    }
+  }
 }
