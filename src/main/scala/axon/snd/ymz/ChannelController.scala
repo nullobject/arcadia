@@ -61,8 +61,8 @@ class ChannelController(config: YMZ280BConfig) extends Module {
     val index = Output(UInt())
     /** Audio output port */
     val audio = ValidIO(new Audio(config.sampleWidth))
-    /** External memory port */
-    val mem = AsyncReadMemIO(config.memAddrWidth, config.memDataWidth)
+    /** ROM port */
+    val rom = AsyncReadMemIO(config.memAddrWidth, config.memDataWidth)
     /** Debug port */
     val debug = new Bundle {
       val init = Output(Bool())
@@ -107,8 +107,8 @@ class ChannelController(config: YMZ280BConfig) extends Module {
   audioPipeline.io.in.bits.pitch := channelReg.pitch
   audioPipeline.io.in.bits.level := channelReg.level
   audioPipeline.io.in.bits.pan := channelReg.pan
-  audioPipeline.io.pcmData.valid := io.mem.valid
-  audioPipeline.io.pcmData.bits := Mux(channelStateReg.nibble, io.mem.dout(3, 0), io.mem.dout(7, 4))
+  audioPipeline.io.pcmData.valid := io.rom.valid
+  audioPipeline.io.pcmData.bits := Mux(channelStateReg.nibble, io.rom.dout(3, 0), io.rom.dout(7, 4))
   audioPipeline.io.loopStart := channelStateReg.loopStart
 
   // Control signals
@@ -118,7 +118,7 @@ class ChannelController(config: YMZ280BConfig) extends Module {
   val done = channelStateReg.done
 
   // Fetch PCM data when the audio pipeline is ready for data
-  val pendingReg = Util.latchSync(audioPipeline.io.pcmData.ready && !io.mem.waitReq, io.mem.valid)
+  val pendingReg = Util.latchSync(audioPipeline.io.pcmData.ready && !io.rom.waitReq, io.rom.valid)
   val memRead = audioPipeline.io.pcmData.ready && !pendingReg
   val memAddr = channelStateReg.addr
 
@@ -203,8 +203,8 @@ class ChannelController(config: YMZ280BConfig) extends Module {
   io.done := stateReg === State.check && done
   io.audio.valid := outputCounterWrap
   io.audio.bits := accumulatorReg.clamp(-32768, 32767)
-  io.mem.rd := memRead
-  io.mem.addr := memAddr
+  io.rom.rd := memRead
+  io.rom.addr := memAddr
   io.debug.init := stateReg === State.init
   io.debug.idle := stateReg === State.idle
   io.debug.read := stateReg === State.read
