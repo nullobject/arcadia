@@ -95,6 +95,7 @@ class SDRAM(val config: Config) extends Module {
   val addrReg = Reg(UInt())
   val dinReg = RegNext(io.mem.din)
   val doutReg = RegNext(io.sdram.dout)
+  val maskReg = RegNext(io.mem.mask)
 
   // Counters
   val (waitCounter, _) = Counter(0 until config.waitCounterMax, reset = nextState =/= stateReg)
@@ -244,6 +245,7 @@ class SDRAM(val config: Config) extends Module {
   io.sdram.bank := bankReg
   io.sdram.addr := addrReg
   io.sdram.din := dinReg
+  io.sdram.mask := maskReg
   io.debug.init := stateReg === State.init
   io.debug.mode := stateReg === State.mode
   io.debug.idle := stateReg === State.idle

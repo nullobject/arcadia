@@ -475,12 +475,14 @@ class SDRAMTest extends AnyFlatSpec with ChiselScalatestTester with Matchers wit
       dut.io.sdram.addr.expect(0)
       dut.clock.step()
       dut.io.mem.din.poke(0x1234)
+      dut.io.mem.mask.poke(0x3)
       dut.clock.step()
 
       // Write
       dut.io.mem.burstDone.expect(true)
       dut.io.sdram.addr.expect(0x401)
       dut.io.sdram.din.expect(0x1234)
+      dut.io.sdram.mask.expect(0x3)
     }
   }
 

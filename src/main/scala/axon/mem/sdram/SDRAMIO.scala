@@ -60,6 +60,8 @@ class SDRAMIO(config: Config) extends Bundle {
   val din = Output(Bits(config.dataWidth.W))
   /** Data output bus */
   val dout = Input(Bits(config.dataWidth.W))
+  /** Byte mask  */
+  val mask = Output(Bits(2.W))
 }
 
 object SDRAMIO {
