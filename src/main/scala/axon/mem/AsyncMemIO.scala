@@ -117,6 +117,25 @@ object AsyncReadMemIO {
   def apply(addrWidth: Int, dataWidth: Int) = new AsyncReadMemIO(addrWidth, dataWidth)
 
   def apply(config: BusConfig) = new AsyncReadMemIO(config)
+
+  /**
+   * Multiplexes requests from multiple read-only memory interface to a single read-only memory
+   * interface. The request is routed to the memory interface with the highest priority.
+   *
+   * @param in A list of enable-interface pairs.
+   */
+  def mux1H(in: Seq[(Bool, AsyncReadMemIO)]): AsyncReadMemIO = {
+    val anySelected = in.map(_._1).reduce(_ || _)
+    val mem = Wire(chiselTypeOf(in.head._2))
+    mem.rd := Mux1H(in.map(a => a._1 -> a._2.rd))
+    mem.addr := Mux1H(in.map(a => a._1 -> a._2.addr))
+    for ((selected, port) <- in) {
+      port.waitReq := (anySelected && !selected) || mem.waitReq
+      port.valid := selected && mem.valid
+      port.dout := mem.dout
+    }
+    mem
+  }
 }
 
 /**
