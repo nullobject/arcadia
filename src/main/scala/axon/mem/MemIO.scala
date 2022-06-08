@@ -99,7 +99,7 @@ class ReadMemIO(addrWidth: Int, dataWidth: Int) extends MemIO(addrWidth, dataWid
    * @param f The transform function.
    */
   def mapAddr(f: UInt => UInt): ReadMemIO = {
-    val mem = Wire(chiselTypeOf(this))
+    val mem = Wire(Flipped(ReadMemIO(f(addr).getWidth, this.dataWidth)))
     mem.rd := rd
     mem.addr := f(addr)
     dout := mem.dout
@@ -212,7 +212,7 @@ class WriteMemIO(addrWidth: Int, dataWidth: Int) extends MemIO(addrWidth, dataWi
    * @param f The transform function.
    */
   def mapAddr(f: UInt => UInt): WriteMemIO = {
-    val mem = Wire(chiselTypeOf(this))
+    val mem = Wire(Flipped(WriteMemIO(f(addr).getWidth, this.dataWidth)))
     mem.wr := wr
     mem.addr := f(addr)
     mem.mask := mask
@@ -309,7 +309,7 @@ class ReadWriteMemIO(addrWidth: Int, dataWidth: Int) extends MemIO(addrWidth, da
    * @param f The transform function.
    */
   def mapAddr(f: UInt => UInt): ReadWriteMemIO = {
-    val mem = Wire(chiselTypeOf(this))
+    val mem = Wire(Flipped(ReadWriteMemIO(f(addr).getWidth, this.dataWidth)))
     mem.rd := rd
     mem.wr := wr
     mem.addr := f(addr)

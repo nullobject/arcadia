@@ -86,7 +86,7 @@ class BurstReadMemIO(addrWidth: Int, dataWidth: Int) extends AsyncReadMemIO(addr
    * @param f The transform function.
    */
   override def mapAddr(f: UInt => UInt): BurstReadMemIO = {
-    val mem = Wire(chiselTypeOf(this))
+    val mem = Wire(Flipped(BurstReadMemIO(f(addr).getWidth, this.dataWidth)))
     mem.rd := rd
     mem.burstLength := burstLength
     waitReq := mem.waitReq
@@ -159,7 +159,7 @@ class BurstWriteMemIO(addrWidth: Int, dataWidth: Int) extends AsyncWriteMemIO(ad
    * @param f The transform function.
    */
   override def mapAddr(f: UInt => UInt): BurstWriteMemIO = {
-    val mem = Wire(chiselTypeOf(this))
+    val mem = Wire(Flipped(BurstWriteMemIO(f(addr).getWidth, this.dataWidth)))
     mem.wr := wr
     mem.burstLength := burstLength
     waitReq := mem.waitReq
@@ -231,7 +231,7 @@ class BurstReadWriteMemIO(addrWidth: Int, dataWidth: Int) extends AsyncReadWrite
    * @param f The transform function.
    */
   override def mapAddr(f: UInt => UInt): BurstReadWriteMemIO = {
-    val mem = Wire(chiselTypeOf(this))
+    val mem = Wire(Flipped(BurstReadWriteMemIO(f(addr).getWidth, this.dataWidth)))
     mem.rd := rd
     mem.wr := wr
     mem.burstLength := burstLength
@@ -252,7 +252,7 @@ object BurstReadWriteMemIO {
   def apply(config: BusConfig) = new BurstReadWriteMemIO(config)
 
   /**
-   * Multiplexes requests from multiple read-write memory interface to a single read-write memory
+   * Multiplexes requests from multiple read-write memory interfaces to a single read-write memory
    * interface. The request is routed to the memory interface with the highest priority.
    *
    * @param in A list of enable-interface pairs.

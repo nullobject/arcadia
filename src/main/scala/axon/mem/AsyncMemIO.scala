@@ -103,7 +103,7 @@ class AsyncReadMemIO(addrWidth: Int, dataWidth: Int) extends ReadMemIO(addrWidth
    * @param f The transform function.
    */
   override def mapAddr(f: UInt => UInt): AsyncReadMemIO = {
-    val mem = Wire(chiselTypeOf(this))
+    val mem = Wire(Flipped(AsyncReadMemIO(f(addr).getWidth, this.dataWidth)))
     mem.rd := rd
     waitReq := mem.waitReq
     valid := mem.valid
@@ -119,7 +119,7 @@ object AsyncReadMemIO {
   def apply(config: BusConfig) = new AsyncReadMemIO(config)
 
   /**
-   * Multiplexes requests from multiple read-only memory interface to a single read-only memory
+   * Multiplexes requests from multiple read-only memory interfaces to a single read-only memory
    * interface. The request is routed to the memory interface with the highest priority.
    *
    * @param in A list of enable-interface pairs.
@@ -177,7 +177,7 @@ class AsyncWriteMemIO(addrWidth: Int, dataWidth: Int) extends WriteMemIO(addrWid
    * @param f The transform function.
    */
   override def mapAddr(f: UInt => UInt): AsyncWriteMemIO = {
-    val mem = Wire(chiselTypeOf(this))
+    val mem = Wire(Flipped(AsyncWriteMemIO(f(addr).getWidth, this.dataWidth)))
     mem.wr := wr
     waitReq := mem.waitReq
     mem.addr := f(addr)
@@ -237,7 +237,7 @@ class AsyncReadWriteMemIO(addrWidth: Int, dataWidth: Int) extends ReadWriteMemIO
    * @param f The transform function.
    */
   override def mapAddr(f: UInt => UInt): AsyncReadWriteMemIO = {
-    val mem = Wire(chiselTypeOf(this))
+    val mem = Wire(Flipped(AsyncReadWriteMemIO(f(addr).getWidth, this.dataWidth)))
     mem.rd := rd
     mem.wr := wr
     waitReq := mem.waitReq
