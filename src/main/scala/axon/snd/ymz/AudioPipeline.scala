@@ -69,7 +69,7 @@ class AudioPipeline(config: YMZ280BConfig) extends Module {
       /** Pipeline state */
       val state = new AudioPipelineState(config)
       /** Audio */
-      val audio = new Audio(config.internalSampleWidth)
+      val audio = Audio(config.internalSampleWidth.W)
     })
     /** PCM data port */
     val pcmData = DeqIO(Bits(config.adpcmDataWidth.W))
@@ -97,7 +97,7 @@ class AudioPipeline(config: YMZ280BConfig) extends Module {
   val stateReg = RegInit(State.idle)
   val inputReg = RegEnable(io.in.bits, io.in.fire)
   val sampleReg = Reg(SInt(config.internalSampleWidth.W))
-  val audioReg = Reg(new Audio(config.internalSampleWidth))
+  val audioReg = Reg(Audio(config.internalSampleWidth.W))
   val pcmDataReg = RegEnable(io.pcmData.bits, io.pcmData.fire)
 
   // ADPCM decoder
@@ -148,14 +148,16 @@ class AudioPipeline(config: YMZ280BConfig) extends Module {
   when(stateReg === State.pan) {
     val s = sampleReg
     val t = inputReg.pan(2, 0)
-    val left = WireInit(s)
-    val right = WireInit(s)
+    val left = Wire(SInt(config.internalSampleWidth.W))
+    val right = Wire(SInt(config.internalSampleWidth.W))
+    left := sampleReg
+    right := sampleReg
     when(inputReg.pan > 8.U) {
       left := s * (~t).asUInt >> 3
     }.elsewhen(inputReg.pan < 7.U) {
       right := s * t >> 3
     }
-    audioReg := Audio(left, right)(config.internalSampleWidth)
+    audioReg := Audio(left, right)
   }
 
   // FSM

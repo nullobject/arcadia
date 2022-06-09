@@ -87,7 +87,7 @@ class YMZ280B(config: YMZ280BConfig) extends Module {
     /** ROM port */
     val rom = AsyncReadMemIO(config.memAddrWidth, config.memDataWidth)
     /** Audio output */
-    val audio = ValidIO(new Audio(config.sampleWidth))
+    val audio = ValidIO(Audio(config.sampleWidth.W))
     /** IRQ */
     val irq = Output(Bool())
     /** Debug signals */

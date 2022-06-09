@@ -60,7 +60,7 @@ class ChannelController(config: YMZ280BConfig) extends Module {
     /** Current channel index */
     val index = Output(UInt())
     /** Audio output port */
-    val audio = ValidIO(new Audio(config.sampleWidth))
+    val audio = ValidIO(Audio(config.sampleWidth.W))
     /** ROM port */
     val rom = AsyncReadMemIO(config.memAddrWidth, config.memDataWidth)
     /** Debug port */
@@ -86,7 +86,7 @@ class ChannelController(config: YMZ280BConfig) extends Module {
 
   // Registers
   val stateReg = RegInit(State.init)
-  val accumulatorReg = Reg(new Audio(config.internalSampleWidth))
+  val accumulatorReg = Reg(Audio(config.internalSampleWidth.W))
 
   // Counters
   val (channelCounter, channelCounterWrap) = Counter.static(config.numChannels, enable = stateReg === State.init || stateReg === State.next)
@@ -123,7 +123,7 @@ class ChannelController(config: YMZ280BConfig) extends Module {
   val memAddr = channelStateReg.addr
 
   // Clear accumulator
-  when(stateReg === State.idle) { accumulatorReg := Audio.zero(config.internalSampleWidth) }
+  when(stateReg === State.idle) { accumulatorReg := Audio.zero(config.internalSampleWidth.W) }
 
   // Start/stop channel
   when(stateReg === State.check) {

@@ -34,20 +34,21 @@ package axon.snd
 
 import axon.Util
 import chisel3._
+import chisel3.internal.firrtl.Width
 
 /** Represents a stereo pair of audio samples. */
-class Audio(private val n: Int) extends Bundle {
+sealed class Audio private[axon](width: Width) extends Bundle {
   /** Left channel data */
-  val left = SInt(n.W)
+  val left = SInt(width)
   /** Right channel data */
-  val right = SInt(n.W)
+  val right = SInt(width)
 
   /**
    * Adds the given audio sample.
    *
    * @param that The audio sample.
    */
-  def +(that: Audio): Audio = Audio(this.left + that.left, this.right + that.right)(n)
+  def +(that: Audio): Audio = Audio(this.left + that.left, this.right + that.right)
 
   /**
    * Clamps the sample between two given values.
@@ -55,35 +56,38 @@ class Audio(private val n: Int) extends Bundle {
    * @param a The minimum value.
    * @param b The maximum value.
    */
-  def clamp(a: Int, b: Int): Audio = Audio(Util.clamp(left, a, b), Util.clamp(right, a, b))(n)
-
-  /**
-   * Resizes the width of the sample.
-   *
-   * The sample will be truncated to the new width.
-   *
-   * @param m The new sample width.
-   */
-  def resize(m: Int): Audio = {
-    assert(m < n, "The new sample width must be smaller than the original")
-    Audio(left.head(m).asSInt, right.head(m).asSInt)(m)
-  }
+  def clamp(a: Int, b: Int): Audio = Audio(Util.clamp(left, a, b), Util.clamp(right, a, b))
 }
 
 object Audio {
   /**
-   * Constructs an audio sample from the left and right channel values.
+   * Creates an audio bundle.
+   *
+   * @param width The channel width.
+   * @return An audio bundle.
+   */
+  def apply(width: Width) = new Audio(width)
+
+  /**
+   * Creates an audio sample from the left and right channel values.
    *
    * @param left  The left channel value.
    * @param right The right channel value.
+   * @return An audio sample.
    */
-  def apply(left: SInt, right: SInt)(n: Int): Audio = {
-    val sample = Wire(new Audio(n))
+  def apply(left: SInt, right: SInt): Audio = {
+    val sample = Wire(new Audio(left.getWidth.W))
     sample.left := left
     sample.right := right
     sample
   }
 
-  /** Constructs an audio sample with zero left and right channel values. */
-  def zero(n: Int) = Audio(0.S, 0.S)(n)
+
+  /**
+   * Creates an audio sample with zero left and right channel values.
+   *
+   * @param width The channel width.
+   * @return An audio sample.
+   */
+  def zero(width: Width) = Audio(0.S(width), 0.S(width))
 }
