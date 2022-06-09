@@ -38,17 +38,15 @@ import chisel3.internal.firrtl.Width
 /**
  * Represents a RGB color.
  *
- * @param redWidth   The red channel width.
- * @param greenWidth The green channel width.
- * @param blueWidth  The blue channel width.
+ * @param width The width of the channels.
  */
-class RGB(redWidth: Width, greenWidth: Width, blueWidth: Width) extends Bundle {
+sealed class RGB private[axon](width: Width) extends Bundle {
   /** Red channel */
-  val r = UInt(redWidth)
+  val r = UInt(width)
   /** Green channel */
-  val g = UInt(greenWidth)
+  val g = UInt(width)
   /** Blue channel */
-  val b = UInt(blueWidth)
+  val b = UInt(width)
 
   /** Bitwise AND operator. */
   def &(that: RGB): RGB = {
@@ -73,23 +71,7 @@ object RGB {
    * @param width The channel width.
    * @return A bundle.
    */
-  def apply(width: Width): RGB = new RGB(width, width, width)
-
-  /**
-   * Constructs a RGB color from a single value.
-   *
-   * @param value The value of the red, green, and blue channels.
-   * @return A RGB color.
-   */
-  def apply(value: Bits): RGB = RGB(value, value, value)
-
-  /**
-   * Constructs a RGB color from a list.
-   *
-   * @param value An list containing the values of the red, green, and blue channels.
-   * @return A RGB color.
-   */
-  def apply(value: Seq[Bits]): RGB = RGB(value(0), value(1), value(2))
+  def apply(width: Width): RGB = new RGB(width)
 
   /**
    * Constructs a RGB color from red, green, and blue values.
@@ -100,17 +82,10 @@ object RGB {
    * @return A RGB color.
    */
   def apply(r: Bits, g: Bits, b: Bits): RGB = {
-    val rgb = Wire(new RGB(r.getWidth.W, g.getWidth.W, b.getWidth.W))
+    val rgb = Wire(new RGB(r.getWidth.W))
     rgb.r := r
     rgb.g := g
     rgb.b := b
     rgb
   }
-
-  /**
-   * Creates a zero RGB color.
-   *
-   * @return A RGB color.
-   */
-  def zero = RGB(0.U, 0.U, 0.U)
 }
