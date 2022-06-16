@@ -1,4 +1,7 @@
+.bloop
 .bsp
-project/target
-target
+.idea
+.metals
+.vscode
+out
 test_run_dir
