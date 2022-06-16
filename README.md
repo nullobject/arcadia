@@ -1,2 +1,3 @@
-# axon
-MiSTer FPGA core framework for Chisel
+# Arcadia
+
+A framework for developing arcade cores for the MiSTer FPGA.

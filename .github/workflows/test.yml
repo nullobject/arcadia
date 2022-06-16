@@ -19,4 +19,4 @@ jobs:
           java-version: '11'
           distribution: 'temurin'
       - name: Units tests
-        run: ./mill axon.test
+        run: ./mill arcadia.test

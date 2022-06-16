@@ -6,10 +6,10 @@ import mill.scalalib.TestModule.ScalaTest
 import $ivy.`de.tototec::de.tobiasroeser.mill.vcs.version::0.1.4`
 import de.tobiasroeser.mill.vcs.version.VcsVersion
 
-object axon extends ScalaModule with PublishModule { m =>
+object arcadia extends ScalaModule with PublishModule { m =>
   def scalaVersion = "2.13.8"
 
-  def scalacOptions = Seq(
+  override def scalacOptions = Seq(
     "-language:reflectiveCalls",
     "-deprecation",
     "-feature",
@@ -17,11 +17,11 @@ object axon extends ScalaModule with PublishModule { m =>
     "-P:chiselplugin:genBundleElements"
   )
 
-  def ivyDeps = Agg(
+  override def ivyDeps = Agg(
     ivy"edu.berkeley.cs::chisel3:3.5.3",
   )
 
-  def scalacPluginIvyDeps = Agg(
+  override def scalacPluginIvyDeps = Agg(
     ivy"edu.berkeley.cs:::chisel3-plugin:3.5.3",
   )
 
@@ -39,15 +39,15 @@ object axon extends ScalaModule with PublishModule { m =>
     })
 
   def pomSettings = PomSettings(
-    description = "axon",
+    description = "arcadia",
     organization = "info.joshbassett",
-    url = "https://github.com/nullobject/axon",
+    url = "https://github.com/nullobject/arcadia",
     licenses = Seq(License.`GPL-3.0-only`),
-    versionControl = VersionControl.github("nullobject", "axon"),
+    versionControl = VersionControl.github("nullobject", "arcadia"),
     developers = Seq(
       Developer("nullobject", "Joshua Bassett", "https://github.com/nullobject")
     )
   )
 
-  def sonatypeUri: String = "https://s01.oss.sonatype.org/service/local"
+  override def sonatypeUri: String = "https://s01.oss.sonatype.org/service/local"
 }
