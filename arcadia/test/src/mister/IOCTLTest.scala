@@ -111,4 +111,22 @@ class IOCTLTest extends AnyFlatSpec with ChiselScalatestTester with Matchers {
       dut.io.mem.wr.expect(true)
     }
   }
+
+  it should "download video data" in {
+    test(new Module {
+      val io = IO(new Bundle {
+        val mem = AsyncWriteMemIO(IOCTL.ADDR_WIDTH, IOCTL.DATA_WIDTH)
+        val ioctl = new IOCTL
+      })
+      io.mem <> io.ioctl.video
+      io.ioctl.waitReq := false.B
+      io.ioctl.din := 0.U
+    }) { dut =>
+      dut.io.mem.wr.expect(false)
+      dut.io.ioctl.index.poke(3)
+      dut.io.ioctl.download.poke(true)
+      dut.io.ioctl.wr.poke(true)
+      dut.io.mem.wr.expect(true)
+    }
+  }
 }

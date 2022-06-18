@@ -97,6 +97,19 @@ class IOCTL extends Bundle {
     din := 0.U
     mem
   }
+
+  /** Converts video mode data to a synchronous write-only memory interface. */
+  def video: AsyncWriteMemIO = {
+    val writeEnable = download && this.index === IOCTL.VIDEO_INDEX.U
+    val mem = Wire(AsyncWriteMemIO(IOCTL.ADDR_WIDTH, IOCTL.DATA_WIDTH))
+    mem.wr := writeEnable && wr
+    waitReq := writeEnable && mem.waitReq
+    mem.addr := addr
+    mem.mask := Fill(mem.maskWidth, 1.U)
+    mem.din := dout
+    din := 0.U
+    mem
+  }
 }
 
 object IOCTL {
@@ -112,6 +125,8 @@ object IOCTL {
   val GAME_INDEX = 1
   /** NVRAM index */
   val NVRAM_INDEX = 2
+  /** Video index */
+  val VIDEO_INDEX = 3
   /** DIP switch index */
   val DIP_INDEX = 254
 
