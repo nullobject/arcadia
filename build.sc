@@ -1,7 +1,4 @@
 import mill._, scalalib._, publish._
-import mill.bsp._
-import mill.define.Sources
-import mill.modules.Util
 import mill.scalalib.TestModule.ScalaTest
 import $ivy.`de.tototec::de.tobiasroeser.mill.vcs.version::0.1.4`
 import de.tobiasroeser.mill.vcs.version.VcsVersion
