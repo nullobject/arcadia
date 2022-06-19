@@ -33,55 +33,63 @@
 package arcadia
 
 import chisel3._
-import chisel3.internal.firrtl.Width
+import chiseltest._
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-/**
- * Represents a RGB color.
- *
- * @param width The width of the channels.
- */
-sealed class RGB private[arcadia](width: Width) extends Bundle {
-  /** Red channel */
-  val r = UInt(width)
-  /** Green channel */
-  val g = UInt(width)
-  /** Blue channel */
-  val b = UInt(width)
-
-  /** Bitwise AND operator. */
-  def &(that: RGB): RGB = {
-    RGB(this.r & that.r, this.g & that.g, this.b & that.b)
+class RGBTest extends AnyFlatSpec with ChiselScalatestTester with Matchers {
+  it should "create a new RGB" in {
+    test(new Module {
+      val io = IO(new Bundle {
+        val a = Output(RGB(4.W))
+      })
+      io.a := RGB(1.U, 2.U, 3.U)
+    }) { dut =>
+      dut.io.a.r.expect(1)
+      dut.io.a.g.expect(2)
+      dut.io.a.b.expect(3)
+    }
   }
 
-  /** Bitwise OR operator. */
-  def |(that: RGB): RGB = {
-    RGB(this.r | that.r, this.g | that.g, this.b | that.b)
+  it should "AND two RGB values" in {
+    test(new Module {
+      val io = IO(new Bundle {
+        val a = Input(RGB(4.W))
+        val b = Input(RGB(4.W))
+        val c = Output(RGB(4.W))
+      })
+      io.c := io.a & io.b
+    }) { dut =>
+      dut.io.a.r.poke(1)
+      dut.io.a.g.poke(2)
+      dut.io.a.b.poke(4)
+      dut.io.b.r.poke(1)
+      dut.io.b.g.poke(2)
+      dut.io.b.b.poke(5)
+      dut.io.c.r.expect(1)
+      dut.io.c.g.expect(2)
+      dut.io.c.b.expect(4)
+    }
   }
-}
 
-object RGB {
-  /**
-   * Creates a RGB bundle.
-   *
-   * @param width The channel width.
-   * @return A bundle.
-   */
-  def apply(width: Width): RGB = new RGB(width)
-
-  /**
-   * Constructs a RGB color from red, green, and blue values.
-   *
-   * @param r The red channel value.
-   * @param g The green channel value.
-   * @param b The blue channel value.
-   * @return A RGB color.
-   */
-  def apply(r: Bits, g: Bits, b: Bits): RGB = {
-    val width = Seq(r.getWidth, g.getWidth, b.getWidth).max
-    val rgb = Wire(new RGB(width.W))
-    rgb.r := r
-    rgb.g := g
-    rgb.b := b
-    rgb
+  it should "OR two RGB values" in {
+    test(new Module {
+      val io = IO(new Bundle {
+        val a = Input(RGB(4.W))
+        val b = Input(RGB(4.W))
+        val c = Output(RGB(4.W))
+      })
+      io.c := io.a | io.b
+    }) { dut =>
+      dut.io.a.r.poke(1)
+      dut.io.a.g.poke(2)
+      dut.io.a.b.poke(4)
+      dut.io.b.r.poke(1)
+      dut.io.b.g.poke(2)
+      dut.io.b.b.poke(5)
+      dut.io.c.r.expect(1)
+      dut.io.c.g.expect(2)
+      dut.io.c.b.expect(5)
+    }
   }
 }
