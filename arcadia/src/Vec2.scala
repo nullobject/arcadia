@@ -30,7 +30,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package arcadia.types
+package arcadia
 
 import chisel3._
 import chisel3.internal.firrtl.Width
@@ -102,7 +102,8 @@ object UVec2 {
    * @return An unsigned vector.
    */
   def apply(x: Bits, y: Bits): UVec2 = {
-    val vec = Wire(new UVec2(x.getWidth.W))
+    val width = Seq(x.getWidth, y.getWidth).max
+    val vec = Wire(new UVec2(width.W))
     vec.x := x.asUInt
     vec.y := y.asUInt
     vec
@@ -153,7 +154,8 @@ object SVec2 {
    * @return A signed vector.
    */
   def apply(x: Bits, y: Bits): SVec2 = {
-    val vec = Wire(new SVec2(x.getWidth.W))
+    val width = Seq(x.getWidth, y.getWidth).max
+    val vec = Wire(new SVec2(width.W))
     vec.x := x.asSInt
     vec.y := y.asSInt
     vec

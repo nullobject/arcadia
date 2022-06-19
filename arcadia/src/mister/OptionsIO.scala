@@ -30,62 +30,52 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package arcadia.types
+package arcadia.mister
 
+import arcadia.SVec2
 import chisel3._
-import chisel3.internal.firrtl.Width
 
-/**
- * Represents a RGB color.
- *
- * @param width The width of the channels.
- */
-sealed class RGB private[arcadia](width: Width) extends Bundle {
-  /** Red channel */
-  val r = UInt(width)
-  /** Green channel */
-  val g = UInt(width)
-  /** Blue channel */
-  val b = UInt(width)
-
-  /** Bitwise AND operator. */
-  def &(that: RGB): RGB = {
-    RGB(this.r & that.r, this.g & that.g, this.b & that.b)
-  }
-
-  /** Bitwise OR operator. */
-  def |(that: RGB): RGB = {
-    RGB(this.r | that.r, this.g | that.g, this.b | that.b)
-  }
-
-  /** Bitwise XOR operator. */
-  def ^(that: RGB): RGB = {
-    RGB(this.r ^ that.r, this.g ^ that.g, this.b ^ that.b)
-  }
+/** An interface that contains the user options. */
+class OptionsIO extends Bundle {
+  /** SDRAM is available */
+  val sdram = Input(Bool())
+  /** CRT offset */
+  val offset = Input(SVec2(OptionsIO.SCREEN_OFFSET_WIDTH.W))
+  /** Rotate the HDMI output 90 degrees */
+  val rotate = Input(Bool())
+  /** Flip the video output */
+  val flip = Input(Bool())
+  /** Video compatibility (60Hz) mode */
+  val compatibility = Input(Bool())
+  /** Service mode */
+  val service = Input(Bool())
+  /** Layer enable flags */
+  val layerEnable = Input(new Bundle {
+    /** Enable the sprite layer */
+    val sprite = Bool()
+    /** Enable the tilemap layers */
+    val layer = Vec(3, Bool())
+  })
+  /** Enable the row scroll effect */
+  val rowScrollEnable = Input(Bool())
+  /** Enable the row select effect */
+  val rowSelectEnable = Input(Bool())
+  /** Frame buffer enable flags */
+  val frameBufferEnable = Input(new Bundle {
+    /** Enable the sprite frame buffer */
+    val sprite = Input(Bool())
+    /** Enable the system frame buffer */
+    val system = Input(Bool())
+  })
+  /** Game index */
+  val gameIndex = Input(UInt(OptionsIO.GAME_INDEX_WIDTH.W))
 }
 
-object RGB {
-  /**
-   * Creates a RGB bundle.
-   *
-   * @param width The channel width.
-   * @return A bundle.
-   */
-  def apply(width: Width): RGB = new RGB(width)
+object OptionsIO {
+  /** The width of the screen offset value */
+  val SCREEN_OFFSET_WIDTH = 4
+  /** The width of the game index */
+  val GAME_INDEX_WIDTH = 4
 
-  /**
-   * Constructs a RGB color from red, green, and blue values.
-   *
-   * @param r The red channel value.
-   * @param g The green channel value.
-   * @param b The blue channel value.
-   * @return A RGB color.
-   */
-  def apply(r: Bits, g: Bits, b: Bits): RGB = {
-    val rgb = Wire(new RGB(r.getWidth.W))
-    rgb.r := r
-    rgb.g := g
-    rgb.b := b
-    rgb
-  }
+  def apply() = new OptionsIO
 }

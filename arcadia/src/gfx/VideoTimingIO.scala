@@ -32,7 +32,7 @@
 
 package arcadia.gfx
 
-import arcadia.types.UVec2
+import arcadia.UVec2
 import chisel3._
 
 /** An interface that contains analog video timing signals. */

@@ -32,7 +32,8 @@
 
 package arcadia.gfx
 
-import arcadia.types._
+import arcadia.mister.OptionsIO
+import arcadia.{SVec2, UVec2}
 import arcadia.util.Counter
 import chisel3._
 
