@@ -105,6 +105,19 @@ class ReadMemIO(addrWidth: Int, dataWidth: Int) extends MemIO(addrWidth, dataWid
     dout := mem.dout
     mem
   }
+
+  /**
+   * Maps the data using the given function.
+   *
+   * @param f The transform function.
+   */
+  def mapData(f: Bits => Bits): ReadMemIO = {
+    val mem = Wire(Flipped(ReadMemIO(this)))
+    mem.rd := rd
+    mem.addr := addr
+    dout := f(mem.dout)
+    mem
+  }
 }
 
 object ReadMemIO {
@@ -219,6 +232,20 @@ class WriteMemIO(addrWidth: Int, dataWidth: Int) extends MemIO(addrWidth, dataWi
     mem.din := din
     mem
   }
+
+  /**
+   * Maps the data using the given function.
+   *
+   * @param f The transform function.
+   */
+  def mapData(f: Bits => Bits): WriteMemIO = {
+    val mem = Wire(Flipped(WriteMemIO(this)))
+    mem.wr := wr
+    mem.addr := addr
+    mem.mask := mask
+    mem.din := f(din)
+    mem
+  }
 }
 
 object WriteMemIO {
@@ -316,6 +343,22 @@ class ReadWriteMemIO(addrWidth: Int, dataWidth: Int) extends MemIO(addrWidth, da
     mem.mask := mask
     mem.din := din
     dout := mem.dout
+    mem
+  }
+
+  /**
+   * Maps the data using the given function.
+   *
+   * @param f The transform function.
+   */
+  def mapData(f: Bits => Bits): ReadWriteMemIO = {
+    val mem = Wire(Flipped(ReadWriteMemIO(this)))
+    mem.rd := rd
+    mem.wr := wr
+    mem.addr := addr
+    mem.mask := mask
+    mem.din := f(din)
+    dout := f(mem.dout)
     mem
   }
 }

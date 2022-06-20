@@ -96,6 +96,23 @@ class BurstReadMemIO(addrWidth: Int, dataWidth: Int) extends AsyncReadMemIO(addr
     dout := mem.dout
     mem
   }
+
+  /**
+   * Maps the data using the given function.
+   *
+   * @param f The transform function.
+   */
+  override def mapData(f: Bits => Bits): BurstReadMemIO = {
+    val mem = Wire(Flipped(BurstReadMemIO(this)))
+    mem.rd := rd
+    mem.burstLength := burstLength
+    waitReq := mem.waitReq
+    valid := mem.valid
+    burstDone := mem.burstDone
+    mem.addr := addr
+    dout := f(mem.dout)
+    mem
+  }
 }
 
 object BurstReadMemIO {
@@ -167,6 +184,23 @@ class BurstWriteMemIO(addrWidth: Int, dataWidth: Int) extends AsyncWriteMemIO(ad
     mem.addr := f(addr)
     mem.mask := mask
     mem.din := din
+    mem
+  }
+
+  /**
+   * Maps the data using the given function.
+   *
+   * @param f The transform function.
+   */
+  override def mapData(f: Bits => Bits): BurstWriteMemIO = {
+    val mem = Wire(Flipped(BurstWriteMemIO(this)))
+    mem.wr := wr
+    mem.burstLength := burstLength
+    waitReq := mem.waitReq
+    burstDone := mem.burstDone
+    mem.addr := addr
+    mem.mask := mask
+    mem.din := f(din)
     mem
   }
 }
@@ -242,6 +276,26 @@ class BurstReadWriteMemIO(addrWidth: Int, dataWidth: Int) extends AsyncReadWrite
     mem.mask := mask
     mem.din := din
     dout := mem.dout
+    mem
+  }
+
+  /**
+   * Maps the data using the given function.
+   *
+   * @param f The transform function.
+   */
+  override def mapData(f: Bits => Bits): BurstReadWriteMemIO = {
+    val mem = Wire(Flipped(BurstReadWriteMemIO(this)))
+    mem.rd := rd
+    mem.wr := wr
+    mem.burstLength := burstLength
+    waitReq := mem.waitReq
+    valid := mem.valid
+    burstDone := mem.burstDone
+    mem.addr := addr
+    mem.mask := mask
+    mem.din := f(din)
+    dout := f(mem.dout)
     mem
   }
 }

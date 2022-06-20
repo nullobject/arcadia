@@ -111,6 +111,21 @@ class AsyncReadMemIO(addrWidth: Int, dataWidth: Int) extends ReadMemIO(addrWidth
     dout := mem.dout
     mem
   }
+
+  /**
+   * Maps the data using the given function.
+   *
+   * @param f The transform function.
+   */
+  override def mapData(f: Bits => Bits): AsyncReadMemIO = {
+    val mem = Wire(Flipped(AsyncReadMemIO(this)))
+    mem.rd := rd
+    waitReq := mem.waitReq
+    valid := mem.valid
+    mem.addr := addr
+    dout := f(mem.dout)
+    mem
+  }
 }
 
 object AsyncReadMemIO {
@@ -185,6 +200,21 @@ class AsyncWriteMemIO(addrWidth: Int, dataWidth: Int) extends WriteMemIO(addrWid
     mem.din := din
     mem
   }
+
+  /**
+   * Maps the data using the given function.
+   *
+   * @param f The transform function.
+   */
+  override def mapData(f: Bits => Bits): AsyncWriteMemIO = {
+    val mem = Wire(Flipped(AsyncWriteMemIO(this)))
+    mem.wr := wr
+    waitReq := mem.waitReq
+    mem.addr := addr
+    mem.mask := mask
+    mem.din := f(din)
+    mem
+  }
 }
 
 object AsyncWriteMemIO {
@@ -246,6 +276,24 @@ class AsyncReadWriteMemIO(addrWidth: Int, dataWidth: Int) extends ReadWriteMemIO
     mem.mask := mask
     mem.din := din
     dout := mem.dout
+    mem
+  }
+
+  /**
+   * Maps the data using the given function.
+   *
+   * @param f The transform function.
+   */
+  override def mapData(f: Bits => Bits): AsyncReadWriteMemIO = {
+    val mem = Wire(Flipped(AsyncReadWriteMemIO(this)))
+    mem.rd := rd
+    mem.wr := wr
+    waitReq := mem.waitReq
+    valid := mem.valid
+    mem.addr := addr
+    mem.mask := mask
+    mem.din := f(din)
+    dout := f(mem.dout)
     mem
   }
 }
