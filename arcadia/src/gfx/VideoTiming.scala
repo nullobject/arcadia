@@ -32,7 +32,6 @@
 
 package arcadia.gfx
 
-import arcadia.mister.OptionsIO
 import arcadia.{SVec2, UVec2}
 import arcadia.util.Counter
 import chisel3._
@@ -43,17 +42,16 @@ import chisel3._
  * @param clockFreq The video clock frequency (Hz).
  * @param clockDiv  The video clock divider.
  * @param hFreq     The horizontal frequency (Hz).
- * @param hInit     The initial horizontal position (for testing).
  * @param vFreq     The vertical frequency (Hz).
+ * @param hInit     The initial horizontal position (for testing).
  * @param vInit     The initial vertical position (for testing).
  */
 case class VideoTimingConfig(clockFreq: Double,
                              clockDiv: Int,
                              hFreq: Double,
-                             hInit: Int = 0,
                              vFreq: Double,
-                             vInit: Int = 0,
-                             displayWidth: Int = 9) {
+                             hInit: Int = 0,
+                             vInit: Int = 0) {
   /** Total width in pixels */
   val width = math.round(clockFreq / clockDiv / hFreq).toInt
   /** Total height in pixels */
@@ -74,13 +72,13 @@ case class VideoTimingConfig(clockFreq: Double,
 class VideoTiming(config: VideoTimingConfig) extends Module {
   val io = IO(new Bundle {
     /** Display region */
-    val display = Input(UVec2(config.displayWidth.W))
+    val display = Input(UVec2(9.W))
     /** Front porch region */
-    val frontPorch = Input(UVec2(config.displayWidth.W))
+    val frontPorch = Input(UVec2(9.W))
     /** Retrace region */
-    val retrace = Input(UVec2(config.displayWidth.W))
+    val retrace = Input(UVec2(9.W))
     /** CRT offset */
-    val offset = Input(SVec2(OptionsIO.SCREEN_OFFSET_WIDTH.W))
+    val offset = Input(SVec2(4.W))
     /** Timing port */
     val timing = VideoTimingIO()
   })
