@@ -39,6 +39,8 @@ class VideoIO extends VideoTimingIO {
   val clock = Output(Clock())
   /** Video reset */
   val reset = Output(Bool())
+  /** Video registers */
+  val regs = Output(new VideoRegs)
   /** Asserted when the video mode is changed */
   val changeMode = Output(Bool())
 }
