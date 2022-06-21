@@ -90,7 +90,7 @@ object UVec2 {
    * Creates an unsigned vector bundle.
    *
    * @param width The data width.
-   * @return A bundle.
+   * @return An unsigned vector bundle.
    */
   def apply(width: Width): UVec2 = new UVec2(width)
 
@@ -142,7 +142,7 @@ object SVec2 {
    * Creates a signed vector bundle.
    *
    * @param width The data width.
-   * @return A bundle.
+   * @return A signed vector bundle.
    */
   def apply(width: Width): SVec2 = new SVec2(width)
 
