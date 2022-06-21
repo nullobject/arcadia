@@ -32,6 +32,7 @@
 
 package arcadia.gfx
 
+import arcadia.UVec2
 import chisel3._
 
 class VideoIO extends VideoTimingIO {
@@ -43,6 +44,9 @@ class VideoIO extends VideoTimingIO {
   val regs = Output(new VideoRegs)
   /** Asserted when the video mode is changed */
   val changeMode = Output(Bool())
+
+  /** Video size in pixels */
+  def size: UVec2 = regs.display
 }
 
 object VideoIO {
