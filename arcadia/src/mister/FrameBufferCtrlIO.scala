@@ -36,11 +36,8 @@ import chisel3._
 
 /**
  * A bundle that contains the MiSTer frame buffer control signals.
- *
- * @param width  The width of the frame buffer in pixels.
- * @param height The height of the frame buffer in pixels.
  */
-class FrameBufferCtrlIO(width: Int, height: Int) extends Bundle {
+class FrameBufferCtrlIO extends Bundle {
   /** Enable the frame buffer */
   val enable = Output(Bool())
   /** The horizontal size of the frame buffer */
@@ -63,18 +60,20 @@ class FrameBufferCtrlIO(width: Int, height: Int) extends Bundle {
   /**
    * Configures the MiSTer frame buffer.
    *
+   * @param width      The width of the frame buffer in pixels.
+   * @param height     The height of the frame buffer in pixels.
    * @param baseAddr   The base address of the frame buffer in DDR memory.
    * @param enable     Enable the frame buffer.
    * @param rotate     Rotate the frame buffer 90 degrees.
    * @param forceBlank Disable the frame buffer output.
    */
-  def configure(baseAddr: UInt, enable: Bool, rotate: Bool, forceBlank: Bool): Unit = {
+  def configure(width: UInt, height: UInt, baseAddr: UInt, enable: Bool, rotate: Bool, forceBlank: Bool): Unit = {
     this.enable := enable
-    hSize := Mux(rotate, height.U, width.U)
-    vSize := Mux(rotate, width.U, height.U)
+    hSize := Mux(rotate, height, width)
+    vSize := Mux(rotate, width, height)
     format := FrameBufferCtrlIO.FORMAT_32BPP.U
     this.baseAddr := baseAddr
-    stride := Mux(rotate, (height * 4).U, (width * 4).U)
+    stride := Mux(rotate, height << 2, width << 2)
     this.forceBlank := forceBlank
   }
 }
@@ -91,5 +90,5 @@ object FrameBufferCtrlIO {
   /** BGR pixel format */
   val FORMAT_BGR = 0x10
 
-  def apply(width: Int, height: Int) = new FrameBufferCtrlIO(width, height)
+  def apply() = new FrameBufferCtrlIO
 }
