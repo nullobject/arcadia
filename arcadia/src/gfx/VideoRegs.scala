@@ -38,7 +38,7 @@ import chisel3._
 /** A bundle that contains the video registers. */
 class VideoRegs extends Bundle {
   /** Display region */
-  val display = UVec2(9.W)
+  val size = UVec2(9.W)
   /** Front porch region */
   val frontPorch = UVec2(9.W)
   /** Retrace region */
@@ -49,22 +49,22 @@ object VideoRegs {
   /**
    * Creates a video registers bundle.
    *
-   * @param width       The screen width.
-   * @param height      The screen height.
+   * @param hSize       The horizontal size of the screen.
+   * @param vSize       The vertical size of the screen.
    * @param hFrontPorch The size of the horizontal front porch.
    * @param vFrontPorch The size of the vertical front porch.
    * @param hRetrace    The size of the horizontal retrace.
    * @param vRetrace    The size of the vertical retrace.
    * @return A video registers bundle.
    */
-  def apply(width: Int,
-            height: Int,
+  def apply(hSize: Int,
+            vSize: Int,
             hFrontPorch: Int,
             vFrontPorch: Int,
             hRetrace: Int,
             vRetrace: Int): VideoRegs = {
     val regs = Wire(new VideoRegs)
-    regs.display := UVec2(width.U, height.U)
+    regs.size := UVec2(hSize.U, vSize.U)
     regs.frontPorch := UVec2(hFrontPorch.U, vFrontPorch.U)
     regs.retrace := UVec2(hRetrace.U, vRetrace.U)
     regs
@@ -76,8 +76,8 @@ object VideoRegs {
    * {{{
    * word   bits                  description
    * -----+-fedc-ba98-7654-3210-+----------------
-   *    0 | ---- ---x xxxx xxxx | display x
-   *    1 | ---- ---x xxxx xxxx | display y
+   *    0 | ---- ---x xxxx xxxx | size x
+   *    1 | ---- ---x xxxx xxxx | size y
    *    2 | ---- ---x xxxx xxxx | front porch x
    *    3 | ---- ---x xxxx xxxx | front porch y
    *    4 | ---- ---x xxxx xxxx | retrace x
@@ -89,7 +89,7 @@ object VideoRegs {
    */
   def decode[T <: Bits](data: Vec[T]): VideoRegs = {
     val regs = Wire(new VideoRegs)
-    regs.display := UVec2(data(0)(8, 0), data(1)(8, 0))
+    regs.size := UVec2(data(0)(8, 0), data(1)(8, 0))
     regs.frontPorch := UVec2(data(2)(8, 0), data(3)(8, 0))
     regs.retrace := UVec2(data(4)(8, 0), data(5)(8, 0))
     regs

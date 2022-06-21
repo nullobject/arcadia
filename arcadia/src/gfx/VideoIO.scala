@@ -46,7 +46,7 @@ class VideoIO extends VideoTimingIO {
   val changeMode = Output(Bool())
 
   /** Video size in pixels */
-  def size: UVec2 = regs.display
+  def size: UVec2 = regs.size
 }
 
 object VideoIO {
