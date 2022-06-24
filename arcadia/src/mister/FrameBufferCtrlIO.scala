@@ -60,14 +60,14 @@ class FrameBufferCtrlIO extends Bundle {
   /**
    * Configures the MiSTer frame buffer.
    *
+   * @param enable     Enable the frame buffer.
    * @param width      The width of the frame buffer in pixels.
    * @param height     The height of the frame buffer in pixels.
    * @param baseAddr   The base address of the frame buffer in DDR memory.
-   * @param enable     Enable the frame buffer.
    * @param rotate     Rotate the frame buffer 90 degrees.
    * @param forceBlank Disable the frame buffer output.
    */
-  def configure(width: UInt, height: UInt, baseAddr: UInt, enable: Bool, rotate: Bool, forceBlank: Bool): Unit = {
+  def configure(enable: Bool, width: UInt, height: UInt, baseAddr: UInt, rotate: Bool, forceBlank: Bool): Unit = {
     this.enable := enable
     hSize := Mux(rotate, height, width)
     vSize := Mux(rotate, width, height)
